@@ -1,0 +1,72 @@
+name: mydealer
+description: A new Flutter application.
+publish_to: 'none'
+version: 1.0.0+1
+ 
+environment:
+  sdk: '>=3.2.0 <4.0.0'
+ 
+dependencies:
+ 
+  flutter:
+    sdk: flutter
+  flutter_localizations:
+    sdk: flutter
+ 
+  cupertino_icons: ^1.0.6
+  get_it: ^7.6.4
+  provider: ^6.1.1
+  dio: ^5.4.0
+  intl: ^0.19.0
+  shared_preferences: ^2.2.2
+  http: ^0.13.3
+  flutter_secure_storage: ^5.0.2
+ 
+ 
+ 
+ 
+dev_dependencies:
+  icons_launcher:
+  flutter_lints: ^2.0.1
+  flutter_test:
+    sdk: flutter
+ 
+ 
+icons_launcher:
+  image_path: "assets/image/ic_launcher.png"
+  platforms:
+    android:
+      enable: true
+    ios:
+      enable: true
+    macos:
+      enable: true
+ 
+flutter_icons:
+  ios: true
+  android: true
+  image_path: "assets/image/ic_launcher.png"
+ 
+ 
+ 
+ 
+ 
+flutter:
+ 
+ 
+ 
+  uses-material-design: true
+ 
+  assets:
+    - assets/image/
+    - assets/language/
+ 
+  fonts:
+    - family: Ubuntu
+      fonts:
+        - asset: assets/font/ubuntu/Ubuntu-Regular.ttf
+          weight: 400
+        - asset: assets/font/ubuntu/Ubuntu-Medium.ttf
+          weight: 500
+        - asset: assets/font/ubuntu/Ubuntu-Bold.ttf
+          weight: 600
