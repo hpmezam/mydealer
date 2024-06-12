@@ -62,8 +62,7 @@ dependencies:
   emoji_picker_flutter: ^1.6.3
   syncfusion_flutter_charts: ^24.1.43
   location: ^6.0.2
- 
- 
+  flutter_polyline_points: ^2.0.0
  
  
 dev_dependencies:
