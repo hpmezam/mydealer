@@ -8,7 +8,7 @@ class AppConstants {
   static const String companyName = '6Valley';
   static const String baseUrl = 'http://home.mydealer.ec:8000';
   static const String loginUri = '/api/login';
-  static const String curtomerUri = '/api/pedidosCliente/ve001';
+  static const String curtomerUri = "/api/vendedor/clientes/'262'";
   static const String configUri = '/api/v1/config';
   static const String sellerUri = '/api/v3/seller/seller-info';
   static const String sellerAndBankUpdate = '/api/v3/seller/seller-update';
