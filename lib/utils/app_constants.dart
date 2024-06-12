@@ -2,6 +2,7 @@ import 'package:mydealer/localization/models/language_model.dart';
 import 'package:mydealer/utils/images.dart';
 
 class AppConstants {
+  static const String googleMapsApiKey = "AIzaSyDy9dRTRDBConVlFlejv-GBFnSKsabAFEU";
   static const String appName = 'MyDe@ler - MEGADESA';
   static const String appVersion = '1.0';
   static const String companyName = '6Valley';
