@@ -4,7 +4,7 @@ import 'package:mydealer/models/customers.dart';
 class CustomerWidget extends StatelessWidget {
   final Customer customer;
 
-  const CustomerWidget({Key? key, required this.customer}) : super(key: key);
+  const CustomerWidget({super.key, required this.customer});
 
   @override
   Widget build(BuildContext context) {
@@ -12,21 +12,16 @@ class CustomerWidget extends StatelessWidget {
       margin: const EdgeInsets.all(5.0),
       elevation: 5,
       child: ListTile(
-        title: Text('${customer.codCliente} - ${customer.nombre}',
+        title: Text('${customer.codCliente} - ${customer.nombreCliente}',
             style: const TextStyle(fontWeight: FontWeight.bold)),
         subtitle: Padding(
           padding: const EdgeInsets.only(top: 8.0),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: <Widget>[
-              Text('Email: ${customer.email}'),
-              Text('Ciudad: ${customer.ciudad}'),
-              Text('Forma de Pago: ${customer.codFormaPago}'),
-              Text(
-                  'Límite de crédito: \$${customer.limiteCredito.toStringAsFixed(2)}'),
-              Text(
-                  'Saldo pendiente: \$${customer.saldoPendiente.toStringAsFixed(2)}'),
-              Text('Calificación: ${customer.calificacion}'),
+              Text(customer.direccion),
+              Text('Límite Crédito: ${customer.limiteCredito}'),
+              Text('Saldo Disponible: ${customer.saldoPendiente}'),
             ],
           ),
         ),
@@ -41,8 +36,8 @@ class CustomerWidget extends StatelessWidget {
               builder: (BuildContext context) {
                 return AlertDialog(
                   title: const Text('Acciones'),
-                  content:
-                      Text('Selecciona una acción para ${customer.nombre}'),
+                  content: Text(
+                      'Selecciona una acción para ${customer.nombreCliente}'),
                   actions: <Widget>[
                     TextButton(
                       onPressed: () => Navigator.pop(context),
@@ -60,46 +55,7 @@ class CustomerWidget extends StatelessWidget {
             );
           },
         ),
-        onTap: () {
-          _showCustomerDetails(context, customer);
-        },
       ),
-    );
-  }
-
-  void _showCustomerDetails(BuildContext context, Customer customer) {
-    showDialog(
-      context: context,
-      builder: (BuildContext context) {
-        return AlertDialog(
-          title: const Text('Detalles de Cliente'),
-          content: SingleChildScrollView(
-            child: ListBody(
-              children: <Widget>[
-                Text('Nombre: ${customer.nombre}'),
-                Text('Email: ${customer.email}'),
-                Text('Ciudad: ${customer.ciudad}'),
-                Text('País: ${customer.pais}'),
-                Text('Vendedor: ${customer.codVendedor}'),
-                Text('Forma de Pago: ${customer.codFormaPago}'),
-                Text('Estado: ${customer.estado}'),
-                Text(
-                    'Límite de crédito: \$${customer.limiteCredito.toStringAsFixed(2)}'),
-                Text(
-                    'Saldo pendiente: \$${customer.saldoPendiente.toStringAsFixed(2)}'),
-                Text('Calificación: ${customer.calificacion}'),
-                Text('Nombre comercial: ${customer.nombreComercial}'),
-              ],
-            ),
-          ),
-          actions: <Widget>[
-            TextButton(
-              onPressed: () => Navigator.of(context).pop(),
-              child: const Text('Cerrar'),
-            ),
-          ],
-        );
-      },
     );
   }
 }
