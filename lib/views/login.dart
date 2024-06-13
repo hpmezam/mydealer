@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:mydealer/services/auth_service.dart';
 import 'package:mydealer/views/dashboard.dart';
-// import 'recuperar_screen.dart'; // Importar la pantalla de recuperación
 
 class LoginScreen extends StatefulWidget {
   @override
@@ -11,6 +10,7 @@ class LoginScreen extends StatefulWidget {
 class _LoginScreenState extends State<LoginScreen> {
   final _emailController = TextEditingController();
   final _passwordController = TextEditingController();
+  bool _isLoading = false;
   final _authService = AuthService();
 
   void _login() async {
@@ -21,32 +21,43 @@ class _LoginScreenState extends State<LoginScreen> {
       return;
     }
 
-    Map<String, dynamic>? loginResponse = await _authService.login(
-        _emailController.text, _passwordController.text);
+    try {
+      setState(() => _isLoading = true); //Activar el indicador de carga
 
-    if (loginResponse != null && loginResponse['error'] == '0') {
-      Navigator.pushReplacement(
-        context,
-        MaterialPageRoute(builder: (context) => DashboardScreen()),
+      Map<String, dynamic>? loginResponse = await _authService.login(
+          _emailController.text, _passwordController.text);
+      setState(() => _isLoading = false); // Ocultar indicador de carga
+
+      if (loginResponse != null && loginResponse['error'] == '0') {
+        Navigator.pushReplacement(
+          context,
+          MaterialPageRoute(builder: (context) => DashboardScreen()),
+        );
+      } else {
+        String errorMessage = loginResponse != null
+            ? loginResponse['message'] ?? 'Login fallido'
+            : 'Error en la conexión';
+        ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+          content: Text(errorMessage),
+          backgroundColor: Colors.redAccent,
+        ));
+      }
+    } catch (e) {
+      setState(() => _isLoading =
+          false); // Asegurar que el indicador de carga se desactive
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+            content:
+                Text('No se pudo conectar al servidor. Intente más tarde.'),
+            backgroundColor: Colors.redAccent),
       );
-    } else {
-      String errorMessage = loginResponse != null
-          ? loginResponse['message'] ?? 'Login fallido'
-          : 'Error en la conexión';
-      ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-        content: Text(errorMessage),
-        backgroundColor: Colors.redAccent,
-      ));
+      print('Login error: $e');
     }
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        title: Text('Login'),
-        backgroundColor: Colors.redAccent,
-      ),
       body: Padding(
         padding: const EdgeInsets.all(16.0),
         child: Column(
@@ -93,24 +104,10 @@ class _LoginScreenState extends State<LoginScreen> {
                 padding: EdgeInsets.symmetric(horizontal: 32, vertical: 12),
                 textStyle: TextStyle(fontSize: 18),
               ),
-              onPressed: _login,
-              child: Text('Login'),
+              onPressed: _isLoading ? null : _login,
+              child: _isLoading ? CircularProgressIndicator() : Text('Login'),
             ),
             SizedBox(height: 10),
-            /*
-            TextButton(
-              onPressed: () {
-                Navigator.push(
-                  context,
-                  MaterialPageRoute(builder: (context) => RecuperarScreen()),
-                );
-              },
-              child: Text(
-                'Recuperar Contraseña',
-                style: TextStyle(color: Colors.redAccent),
-              ),
-            ),
-            */
           ],
         ),
       ),
