@@ -1,38 +1,93 @@
-// class HomeService {
-//    static const String _loginUrl = 'http://home.mydealer.ec:8000/api/login'; // Asegúrate de tener la URL correcta aquí
+import 'dart:convert';
+import 'package:http/http.dart' as http;
+import 'package:mydealer/models/home_model.dart';
+import 'package:mydealer/utils/app_constants.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
-//   Future<void> login(String username, String password) async {
-//     final response = await http.post(
-//       Uri.parse(_loginUrl),
-//       headers: {'Content-Type': 'application/json'},
-//       body: jsonEncode({"login": username, "password": password}),
-//     );
+class HomeService {
+  final String baseUrl;
 
-//     if (response.statusCode == 200) {
-//       var data = jsonDecode(response.body);
-//       if (data['error'] == '0') {
-//         await _saveDataLocally(data['datos'][0]['data_usuario'], data['datos'][0]['token']);
-//       } else {
-//         throw Exception('Login failed: ${data['mensaje']}');
-//       }
-//     } else {
-//       throw Exception('Failed to load data');
-//     }
-//   }
+  HomeService(this.baseUrl);
 
-//   Future<void> _saveDataLocally(Map<String, dynamic> userData, String token) async {
-//     final prefs = await SharedPreferences.getInstance();
-//     await prefs.setString('token', token);
-//     await prefs.setString('codvendedor', userData['codvendedor']);
-//     await prefs.setString('login', userData['login']);
-//     await prefs.setString('codruta', userData['codruta']);
-//   }
+  Future<HomeOrders?> fetchOrders() async {
+    final SharedPreferences prefs = await SharedPreferences.getInstance();
+    String? codvendedor = prefs.getString('codvendedor');
 
-//   Future<void> logout() async {
-//     final prefs = await SharedPreferences.getInstance();
-//     await prefs.remove('token');
-//     await prefs.remove('codvendedor');
-//     await prefs.remove('login');
-//     await prefs.remove('codruta');
-//   }
-// }
+    if (codvendedor == null) {
+      throw Exception('Código de vendedor no disponible');
+    }
+    try {
+      String url = '$baseUrl/AppConstants.numberOrders/$codvendedor';
+      final response = await http.get(Uri.parse(url));
+      if (response.statusCode == 200) {
+        // Si el servidor devuelve una respuesta OK, parseamos el JSON
+        return HomeOrders.fromJson(json.decode(response.body));
+      } else {
+        // Si la respuesta no fue OK, lanzamos un error
+        throw Exception('Failed to load home data');
+      }
+    } catch (e) {
+      // Para manejar errores en la petición o el parsing
+      throw Exception('Failed to load home data: $e');
+    }
+  }
+
+  Future<HomePayments?> fetchPayments() async {
+    final SharedPreferences prefs = await SharedPreferences.getInstance();
+    String? codvendedor = prefs.getString('codvendedor');
+
+    if (codvendedor == null) {
+      throw Exception('Código de vendedor no disponible');
+    }
+
+    try {
+      String url = '$baseUrl/AppConstants.numberPayments/$codvendedor';
+      final response = await http.get(Uri.parse(url));
+
+      if (response.statusCode == 200) {
+        // Si el servidor devuelve una respuesta OK, parseamos el JSON
+        return HomePayments.fromJson(json.decode(response.body));
+      } else {
+        // Si la respuesta no fue OK, lanzamos un error
+        throw Exception(
+            'Failed to load home data: Status code ${response.statusCode}');
+      }
+    } catch (e) {
+      // Para manejar errores en la petición o el parsing
+      throw Exception('Failed to load home data: $e');
+    }
+  }
+
+  Future<List<HomeOrders>> fetchOrder() async {
+    final SharedPreferences prefs = await SharedPreferences.getInstance();
+    String? codvendedor = prefs.getString('codvendedor');
+    String baseUrl =
+        '${AppConstants.baseUrl}${AppConstants.numberOrders}/$codvendedor';
+
+    try {
+      final response = await http.get(Uri.parse(baseUrl));
+      final data = json.decode(response.body) as Map<String, dynamic>;
+      final List<dynamic> customersJson = data['datos'] ?? [];
+      return customersJson.map((json) => HomeOrders.fromJson(json)).toList();
+    } catch (e) {
+      print('Error fetching customers: $e');
+      return [];
+    }
+  }
+  Future<List<HomePayments>> fetchPayment() async {
+    final SharedPreferences prefs = await SharedPreferences.getInstance();
+    String? codvendedor = prefs.getString('codvendedor');
+    String baseUrl =
+        '${AppConstants.baseUrl}${AppConstants.numberOrders}/$codvendedor';
+
+    try {
+      final response = await http.get(Uri.parse(baseUrl));
+      final data = json.decode(response.body) as Map<String, dynamic>;
+      final List<dynamic> customersJson = data['datos'] ?? [];
+      return customersJson.map((json) => HomePayments.fromJson(json)).toList();
+    } catch (e) {
+      print('Error fetching customers: $e');
+      return [];
+    }
+  }
+}

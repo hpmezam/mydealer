@@ -12,8 +12,12 @@
     <uses-permission android:name="android.permission.READ_MEDIA_IMAGES"/>
     <uses-permission android:name="android.permission.READ_MEDIA_VIDEO"/>
     <uses-permission android:name="android.permission.READ_MEDIA_AUDIO"/>
+    <uses-permission android:name="android.permission.FOREGROUND_SERVICE" />
+    <uses-permission android:name="android.permission.ACCESS_BACKGROUND_LOCATION"/>
+    <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />
+    <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION" />
 
-   <application
+    <application
         android:label="6Valley Vendor"
        android:name="${applicationName}"
         android:icon="@mipmap/ic_launcher"
@@ -24,7 +28,7 @@
        >
 
        <meta-data
-           android:name="com.google.android.geo.API_KEY"
+           android:name="com.google.android.geo.API_KEY_SECOND"
            android:value="AIzaSyCcr56ZxhkvdYntPYfiUmPruGo8kt4eqWk" />
 
         <activity
@@ -58,6 +62,9 @@
         <meta-data
             android:name="flutterEmbedding"
             android:value="2" />
+        <meta-data
+            android:name="com.google.android.geo.API_KEY"
+            android:value="AIzaSyDy9dRTRDBConVlFlejv-GBFnSKsabAFEU" />
 
     </application>
 </manifest>

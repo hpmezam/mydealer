@@ -1,20 +1,20 @@
 import 'package:flutter/material.dart';
-import 'package:mydealer/views/login.dart';
+import 'services/check_gps_permissions.dart';
 
 void main() => runApp(MyApp());
 
 class MyApp extends StatelessWidget {
   const MyApp({super.key});
+
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-        title: 'myDe@ler',
-        debugShowCheckedModeBanner: false,
-        theme: ThemeData(
-          // useMaterial3: false,
-          primarySwatch: Colors.blue,
-        ),
-        home: LoginScreen()); //Login
+      title: 'myDe@ler',
+      debugShowCheckedModeBanner: false,
+      theme: ThemeData(
+        primarySwatch: Colors.blue,
+      ),
+      home: const CheckGpsPermissions(), // Pantalla de verificación
+    );
   }
 }
-

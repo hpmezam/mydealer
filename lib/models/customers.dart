@@ -1,63 +1,40 @@
 class Customer {
+  final int codRutaDet;
   final String codCliente;
-  final String codTipoCliente;
-  final String nombre;
-  final String email;
-  final String password;
-  final String pais;
-  final String provincia;
-  final String ciudad;
-  final String codVendedor;
-  final String codFormaPago;
-  final String estado;
+  final String codDireccionEnvio;
+  final String cedulaRuc;
+  final String nombreCliente;
+  final String direccion;
+  final double? latitud;
+  final double? longitud;
   final double limiteCredito;
   final double saldoPendiente;
-  final String cedulaRuc;
-  final String codListaPrecio;
-  final String calificacion;
-  final String nombreComercial;
 
   Customer({
+    required this.codRutaDet,
     required this.codCliente,
-    required this.codTipoCliente,
-    required this.nombre,
-    required this.email,
-    required this.password,
-    required this.pais,
-    required this.provincia,
-    required this.ciudad,
-    required this.codVendedor,
-    required this.codFormaPago,
-    required this.estado,
+    required this.codDireccionEnvio,
+    required this.cedulaRuc,
+    required this.nombreCliente,
+    required this.direccion,
+    this.latitud,
+    this.longitud,
     required this.limiteCredito,
     required this.saldoPendiente,
-    required this.cedulaRuc,
-    required this.codListaPrecio,
-    required this.calificacion,
-    required this.nombreComercial,
   });
 
   factory Customer.fromJson(Map<String, dynamic> json) {
     return Customer(
-      codCliente: json['codcliente'] ?? '',
-      codTipoCliente: json['codtipocliente'] ?? '',
-      nombre: json['nombre'] ?? '',
-      email: json['email']?.replaceAll("'", "") ?? '',
-      password: json['password'] ?? '',
-      pais: json['pais']?.replaceAll("'", "") ?? '',
-      provincia: json['provincia'] ?? '',
-      ciudad: json['ciudad']?.replaceAll("'", "") ?? '',
-      codVendedor: json['codvendedor']?.replaceAll("'", "") ?? '',
-      codFormaPago: json['codformapago']?.replaceAll("'", "") ?? '',
-      estado: json['estado'] ?? '',
-      limiteCredito:
-          double.tryParse(json['limitecredito']?.toString() ?? '0') ?? 0.0,
-      saldoPendiente:
-          double.tryParse(json['saldopendiente']?.toString() ?? '0') ?? 0.0,
+      codRutaDet: json['codrutadet'] ?? 0,
+      codCliente: json['codcliente']?.replaceAll("'", "") ?? '',
+      codDireccionEnvio: json['coddireccionenvio']?.replaceAll("'", "") ?? '',
       cedulaRuc: json['cedularuc']?.replaceAll("'", "") ?? '',
-      codListaPrecio: json['codlistaprecio']?.replaceAll("'", "") ?? '',
-      calificacion: json['calificacion']?.replaceAll("'", "") ?? '',
-      nombreComercial: json['nombrecomercial'] ?? '',
+      nombreCliente: json['cliente_nombre']?.replaceAll("'", "") ?? '',
+      direccion: json['direccion']?.replaceAll("'", "") ?? '',
+      latitud: json['latitud'] != null ? double.tryParse(json['latitud'].toString()) : null,
+      longitud: json['longitud'] != null ? double.tryParse(json['longitud'].toString()) : null,
+      limiteCredito: double.tryParse(json['limitecredito'].toString()) ?? 0.0,
+      saldoPendiente: double.tryParse(json['saldopendiente'].toString()) ?? 0.0,
     );
   }
 }
