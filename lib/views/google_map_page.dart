@@ -1,13 +1,14 @@
 import 'dart:async';
-
 import 'package:flutter/material.dart';
 import 'package:flutter_polyline_points/flutter_polyline_points.dart';
-import 'package:mydealer/utils/app_constants.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:location/location.dart';
+import 'package:mydealer/utils/app_constants.dart';
 
 class GoogleMapPage extends StatefulWidget {
-  const GoogleMapPage({super.key});
+  final LatLng destination;
+
+  const GoogleMapPage({super.key, required this.destination});
 
   @override
   State<GoogleMapPage> createState() => _GoogleMapPageState();
@@ -15,12 +16,9 @@ class GoogleMapPage extends StatefulWidget {
 
 class _GoogleMapPageState extends State<GoogleMapPage> {
   final locationController = Location();
-
-  static const googlePlex = LatLng(-2.1491065969059133, -79.90130829378886);
-  static const mountainView = LatLng(-2.11146898352403, -79.908271016649);
-
   LatLng? currentPosition;
   Map<PolylineId, Polyline> polylines = {};
+  Completer<GoogleMapController> _controller = Completer();
 
   @override
   void initState() {
@@ -32,48 +30,49 @@ class _GoogleMapPageState extends State<GoogleMapPage> {
   Future<void> initializeMap() async {
     await fetchLocationUpdates();
     final coordinates = await fetchPolylinePoints();
-    generatePolyLineFromPoints(coordinates);
+    if (coordinates.isNotEmpty) {
+      generatePolyLineFromPoints(coordinates);
+    }
   }
 
   @override
   Widget build(BuildContext context) => Scaffold(
-        body: currentPosition == null
-            ? const Center(child: CircularProgressIndicator())
-            : GoogleMap(
-                initialCameraPosition: const CameraPosition(
-                  target: googlePlex,
-                  zoom: 13,
-                ),
-                markers: {
-                  Marker(
-                    markerId: const MarkerId('currentLocation'),
-                    icon: BitmapDescriptor.defaultMarker,
-                    position: currentPosition!,
-                  ),
-                  const Marker(
-                    markerId: MarkerId('sourceLocation'),
-                    icon: BitmapDescriptor.defaultMarker,
-                    position: googlePlex,
-                  ),
-                  const Marker(
-                    markerId: MarkerId('destinationLocation'),
-                    icon: BitmapDescriptor.defaultMarker,
-                    position: mountainView,
-                  )
-                },
-                polylines: Set<Polyline>.of(polylines.values),
-              ),
-      );
+    body: currentPosition == null
+        ? const Center(child: CircularProgressIndicator())
+        : GoogleMap(
+      initialCameraPosition: CameraPosition(
+        target: currentPosition!,
+        zoom: 13,
+      ),
+      markers: {
+        Marker(
+          markerId: const MarkerId('currentLocation'),
+          icon: BitmapDescriptor.defaultMarker,
+          position: currentPosition!,
+        ),
+        Marker(
+          markerId: const MarkerId('destinationLocation'),
+          icon: BitmapDescriptor.defaultMarker,
+          position: widget.destination,
+        ),
+      },
+      polylines: Set<Polyline>.of(polylines.values),
+      onMapCreated: (GoogleMapController controller) {
+        _controller.complete(controller);
+      },
+    ),
+  );
 
   Future<void> fetchLocationUpdates() async {
     bool serviceEnabled;
     PermissionStatus permissionGranted;
 
     serviceEnabled = await locationController.serviceEnabled();
-    if (serviceEnabled) {
+    if (!serviceEnabled) {
       serviceEnabled = await locationController.requestService();
-    } else {
-      return;
+      if (!serviceEnabled) {
+        return;
+      }
     }
 
     permissionGranted = await locationController.hasPermission();
@@ -93,6 +92,10 @@ class _GoogleMapPageState extends State<GoogleMapPage> {
             currentLocation.longitude!,
           );
         });
+
+        if (polylines.isEmpty) {
+          initializeMap();
+        }
       }
     });
   }
@@ -102,8 +105,8 @@ class _GoogleMapPageState extends State<GoogleMapPage> {
 
     final result = await polylinePoints.getRouteBetweenCoordinates(
       AppConstants.googleMapsApiKey,
-      PointLatLng(googlePlex.latitude, googlePlex.longitude),
-      PointLatLng(mountainView.latitude, mountainView.longitude),
+      PointLatLng(currentPosition!.latitude, currentPosition!.longitude),
+      PointLatLng(widget.destination.latitude, widget.destination.longitude),
     );
 
     if (result.points.isNotEmpty) {
@@ -111,7 +114,7 @@ class _GoogleMapPageState extends State<GoogleMapPage> {
           .map((point) => LatLng(point.latitude, point.longitude))
           .toList();
     } else {
-      debugPrint(result.errorMessage);
+      debugPrint('Error fetching polyline points: ${result.errorMessage}');
       return [];
     }
   }
