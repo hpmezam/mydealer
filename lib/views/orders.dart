@@ -1,26 +1,6 @@
 import 'package:flutter/material.dart';
-
-// Mockup de datos para las órdenes
-final List<Map<String, dynamic>> orders = [
-  {
-    "id": "100184",
-    "amount": "\$485.00",
-    "date": "9 Jan, 2023 10:59 AM",
-    "status": "Pending"
-  },
-  {
-    "id": "100180",
-    "amount": "\$485.00",
-    "date": "9 Jan, 2023 10:56 AM",
-    "status": "Pending"
-  },
-  {
-    "id": "100175",
-    "amount": "\$485.00",
-    "date": "9 Jan, 2023 10:48 AM",
-    "status": "Delivered"
-  },
-];
+import 'package:http/http.dart' as http;
+import 'dart:convert';
 
 class OrdersPage extends StatefulWidget {
   @override
@@ -30,17 +10,85 @@ class OrdersPage extends StatefulWidget {
 class _OrdersPageState extends State<OrdersPage>
     with SingleTickerProviderStateMixin {
   TabController? _tabController;
+  List<Map<String, dynamic>> _orders = [];
+  bool _loading = false;
 
   @override
   void initState() {
     super.initState();
     _tabController = TabController(length: 4, vsync: this);
+    //_fetchVendedorID();
   }
 
   @override
   void dispose() {
     _tabController?.dispose();
     super.dispose();
+  }
+
+  // Future<void> _fetchVendedorID() async {
+  //   setState(() {
+  //     _loading = true;
+  //   });
+
+  //   final String url = 'http://home.mydealer.ec:8000/api/vendedorLogueado';
+  //   print('Fetching vendedor ID from: $url');
+
+  //   try {
+  //     final response = await http.get(Uri.parse(url));
+  //     if (response.statusCode == 200) {
+  //       final data = json.decode(response.body);
+  //       final String vendedorID = data['vendedorID'].toString();
+  //       print('Vendedor ID: $vendedorID');
+  //       _fetchOrders(vendedorID);
+  //     } else {
+  //       print(
+  //           'Failed to fetch vendedor ID, status code: ${response.statusCode}');
+  //       setState(() {
+  //         _loading = false;
+  //       });
+  //     }
+  //   } catch (e) {
+  //     print('Error fetching vendedor ID: $e');
+  //     setState(() {
+  //       _loading = false;
+  //     });
+  //   }
+  // }
+
+  Future<void> _fetchOrders(String vendedorID) async {
+    final String url =
+        'http://home.mydealer.ec:8000/api/pedidosCompleto/$vendedorID///';
+    print('Fetching orders from: $url');
+
+    try {
+      final response = await http.get(Uri.parse(url));
+      if (response.statusCode == 200) {
+        final data = json.decode(response.body);
+        print('Orders data: $data');
+        setState(() {
+          _orders = (data['datos'] as List)
+              .map((i) => {
+                    "id": i['srorden'].toString(),
+                    "amount": "\$${i['total']}",
+                    "date": i['fecha'],
+                    "status": i['estado'],
+                  })
+              .toList();
+          _loading = false;
+        });
+      } else {
+        print('Failed to fetch orders, status code: ${response.statusCode}');
+        setState(() {
+          _loading = false;
+        });
+      }
+    } catch (e) {
+      print('Error fetching orders: $e');
+      setState(() {
+        _loading = false;
+      });
+    }
   }
 
   @override
@@ -61,26 +109,22 @@ class _OrdersPageState extends State<OrdersPage>
       body: TabBarView(
         controller: _tabController,
         children: [
-          _buildOrderList(context, "Pedidos"),
-          _buildOrderList(context, "P Pend"),
-          _buildOrderList(context, "Cobros"),
-          _buildOrderList(context, "C Pend"),
+          _loading
+              ? Center(child: CircularProgressIndicator())
+              : _buildOrderList(context),
+          Center(child: Text('P Pend')),
+          Center(child: Text('Cobros')),
+          Center(child: Text('C Pend')),
         ],
       ),
     );
   }
 
-  Widget _buildOrderList(BuildContext context, String filter) {
-    List<Map<String, dynamic>> filteredOrders = orders;
-    if (filter != "All") {
-      filteredOrders =
-          orders.where((order) => order['status'] == filter).toList();
-    }
-
+  Widget _buildOrderList(BuildContext context) {
     return ListView.builder(
-      itemCount: filteredOrders.length,
+      itemCount: _orders.length,
       itemBuilder: (context, index) {
-        final order = filteredOrders[index];
+        final order = _orders[index];
         return _buildOrderItem(order);
       },
     );
@@ -97,4 +141,10 @@ class _OrdersPageState extends State<OrdersPage>
       ),
     );
   }
+}
+
+void main() {
+  runApp(MaterialApp(
+    home: OrdersPage(),
+  ));
 }
