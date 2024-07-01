@@ -1,4 +1,7 @@
 import 'package:flutter/material.dart';
+import 'package:mydealer/utils/color_resources.dart';
+import 'package:mydealer/utils/dimensions.dart';
+import 'package:mydealer/utils/styles.dart';
 import 'package:mydealer/views/customers.dart';
 import 'package:mydealer/views/home.dart';
 import 'package:mydealer/views/management.dart';
@@ -63,8 +66,11 @@ class _DashboardScreenState extends State<DashboardScreen> {
           ),
         ],
         currentIndex: _selectedIndex,
-        selectedItemColor: Colors.amber[800],
-        unselectedItemColor: Colors.blueGrey,
+        selectedItemColor: Theme.of(context).primaryColor,
+        unselectedItemColor: ColorResources.hintTextColor,
+        selectedFontSize: Dimensions.fontSizeSmall,
+        unselectedFontSize: Dimensions.fontSizeSmall,
+        selectedLabelStyle: robotoBold,
         showUnselectedLabels: true,
         onTap: _onItemTapped,
       ),

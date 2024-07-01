@@ -58,7 +58,13 @@ class _CustomersPageState extends State<CustomersPage>
                 ),
                 onChanged: (value) => _filterCustomers(value),
               )
-            : const Text("Clientes"),
+            : const Text(
+                "Clientes",
+                style: TextStyle(
+                  color: Colors.black87,
+                  fontWeight: FontWeight.bold,
+                ),
+              ),
         actions: [
           IconButton(
             icon: Icon(_isSearching ? Icons.close : Icons.search),
@@ -123,7 +129,9 @@ class _CustomersPageState extends State<CustomersPage>
 
   void _filterCustomers(String query) {
     List<Customer> results = customers.where((customer) {
-      return customer.nombreCliente.toLowerCase().contains(query.toLowerCase()) ||
+      return customer.nombreCliente
+              .toLowerCase()
+              .contains(query.toLowerCase()) ||
           customer.codCliente.toLowerCase().contains(query.toLowerCase());
     }).toList();
     setState(() {
