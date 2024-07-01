@@ -11,17 +11,24 @@ class _ManagementPageState extends State<ManagementPage> {
   DateTime _startDate = DateTime.now();
   DateTime _endDate = DateTime.now();
   String _selectedState = 'Todos';
-  String _clientCode = ''; // Campo de texto para el código del cliente
-  List<String> _states = [
-    'Todos',
-    'E',
-    'A',
-    'I'
-  ]; // Añade los estados relevantes
+  String _clientCode = '';
+  List<String> _states = ['Todos', 'E', 'A', 'I'];
   List<Order> _orders = [];
   bool _loading = false;
+  String _vendedorID = '';
+
+  void _login(String vendedorID) {
+    setState(() {
+      _vendedorID = vendedorID;
+    });
+  }
 
   Future<void> _fetchOrders() async {
+    if (_vendedorID.isEmpty) {
+      print('Error');
+      return;
+    }
+
     setState(() {
       _loading = true;
     });
@@ -33,19 +40,17 @@ class _ManagementPageState extends State<ManagementPage> {
     final String estado = _selectedState != 'Todos' ? _selectedState : '';
 
     final String url =
-        'http://home.mydealer.ec:8000/api/pedidosCompleto/160/$formattedStartDate/$formattedEndDate/${_clientCode}/$estado';
+        'http://home.mydealer.ec:8000/api/pedidosCompleto/$_vendedorID/$formattedStartDate/$formattedEndDate/${_clientCode}/$estado';
 
-    print('Fetching data from: $url'); // Añade un print para verificar la URL
+    print('Fetching data from: $url');
 
     try {
       final response = await http.get(Uri.parse(url));
-      print(
-          'Status code: ${response.statusCode}'); // Añade un print para verificar el código de estado
+      print('Status code: ${response.statusCode}');
 
       if (response.statusCode == 200) {
         final data = json.decode(response.body);
-        print(
-            'Data received: $data'); // Añade un print para verificar los datos recibidos
+        print('Data received: $data');
 
         if (data['datos'] != null && data['datos'].isNotEmpty) {
           setState(() {
@@ -95,6 +100,8 @@ class _ManagementPageState extends State<ManagementPage> {
 
   @override
   Widget build(BuildContext context) {
+    _login('160');
+
     return Scaffold(
       appBar: AppBar(
         title: Text('Consulta de Pedidos'),
