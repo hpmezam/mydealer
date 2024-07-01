@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:mydealer/dataBaseHelper/dbh_customer.dart';
 
 class DownloadPage extends StatefulWidget {
   @override
@@ -6,15 +7,10 @@ class DownloadPage extends StatefulWidget {
 }
 
 class _DownloadPageState extends State<DownloadPage> {
-  // Datos simulados para la tabla
   final List<Map<String, String>> data = [
-    {"category": "Productos", "updateDate": "2021-10-04", "status": "OK"},
-    {
-      "category": "Lista de Precios",
-      "updateDate": "2021-10-04",
-      "status": "OK"
-    },
-    {"category": "Estado Cuenta", "updateDate": "2021-10-04", "status": "OK"},
+    {"category": "Descargar Todo", "updateDate": "2021-10-04", "status": "OK"},
+    {"category": "Clientes", "updateDate": "2021-10-04", "status": "OK"},
+    {"category": "Pedidos", "updateDate": "2021-10-04", "status": "OK"},
     {
       "category": "Cuentas Bancarias",
       "updateDate": "2021-10-04",
@@ -22,6 +18,30 @@ class _DownloadPageState extends State<DownloadPage> {
     },
     {"category": "Stock", "updateDate": "2021-10-04", "status": "OK"},
   ];
+
+  void downloadData(String category) {
+    switch (category) {
+      case "Clientes":
+        downloadClients();
+        break;
+      default:
+        print('Descargando datos para $category');
+    }
+  }
+
+  void downloadClients() {
+    print("Iniciando descarga de datos de clientes...");
+    saveClients();
+    ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
+      content: Text('Datos de Clientes Descargados'),
+       backgroundColor: Color.fromARGB(255, 30, 255, 0),
+    ));
+    print("Clientes Guardados ***************************************");
+  }
+
+  void saveClients() async {
+    await DatabaseHelperCustomer().downloadClientes();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -39,9 +59,7 @@ class _DownloadPageState extends State<DownloadPage> {
                   "Fecha de Actualización: ${data[index]["updateDate"]} - Estado: ${data[index]["status"]}"),
               trailing: IconButton(
                 icon: Icon(Icons.download_rounded),
-                onPressed: () {
-                  print('Descargando datos para ${data[index]["category"]}');
-                },
+                onPressed: () => downloadData(data[index]["category"]!),
               ),
             ),
           );

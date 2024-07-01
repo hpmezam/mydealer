@@ -10,10 +10,25 @@ class ManagementPage extends StatefulWidget {
 class _ManagementPageState extends State<ManagementPage> {
   DateTime _startDate = DateTime.now();
   DateTime _endDate = DateTime.now();
+  String _selectedState = 'Todos';
+  String _clientCode = '';
+  List<String> _states = ['Todos', 'E', 'A', 'I'];
   List<Order> _orders = [];
   bool _loading = false;
+  String _vendedorID = '';
+
+  void _login(String vendedorID) {
+    setState(() {
+      _vendedorID = vendedorID;
+    });
+  }
 
   Future<void> _fetchOrders() async {
+    if (_vendedorID.isEmpty) {
+      print('Error');
+      return;
+    }
+
     setState(() {
       _loading = true;
     });
@@ -22,8 +37,10 @@ class _ManagementPageState extends State<ManagementPage> {
         "${_startDate.toIso8601String().split('T')[0]}";
     final String formattedEndDate =
         "${_endDate.toIso8601String().split('T')[0]}";
+    final String estado = _selectedState != 'Todos' ? _selectedState : '';
+
     final String url =
-        'http://home.mydealer.ec:8000/api/pedidosCompleto/ve001/$formattedStartDate/$formattedEndDate';
+        'http://home.mydealer.ec:8000/api/pedidosCompleto/$_vendedorID/$formattedStartDate/$formattedEndDate/${_clientCode}/$estado';
 
     print('Fetching data from: $url');
 
@@ -33,6 +50,8 @@ class _ManagementPageState extends State<ManagementPage> {
 
       if (response.statusCode == 200) {
         final data = json.decode(response.body);
+        print('Data received: $data');
+
         if (data['datos'] != null && data['datos'].isNotEmpty) {
           setState(() {
             _orders =
@@ -81,6 +100,8 @@ class _ManagementPageState extends State<ManagementPage> {
 
   @override
   Widget build(BuildContext context) {
+    _login('160');
+
     return Scaffold(
       appBar: AppBar(
         title: Text('Consulta de Pedidos'),
@@ -88,41 +109,104 @@ class _ManagementPageState extends State<ManagementPage> {
       body: SingleChildScrollView(
         child: Column(
           children: [
-            ListTile(
-              leading: Icon(Icons.calendar_today),
-              title: Text('Desde: ${_startDate.toString().substring(0, 10)}'),
-              onTap: () => _selectDate(context, true),
-            ),
-            ListTile(
-              leading: Icon(Icons.calendar_today),
-              title: Text('Hasta: ${_endDate.toString().substring(0, 10)}'),
-              onTap: () => _selectDate(context, false),
-            ),
-            ElevatedButton(
-              onPressed: _fetchOrders,
-              child: Text('Mostrar'),
-            ),
-            _loading ? CircularProgressIndicator() : _buildOrderTable(),
+            _buildClientInput(),
+            _buildDateSelector(),
+            _buildStateSelector(),
+            _buildShowButton(),
+            _loading ? CircularProgressIndicator() : _buildOrderList(),
           ],
         ),
       ),
     );
   }
 
-  Widget _buildOrderTable() {
-    return DataTable(
-      columns: [
-        DataColumn(label: Text('Orden')),
-        DataColumn(label: Text('Cliente')),
-        DataColumn(label: Text('Fecha')),
+  Widget _buildClientInput() {
+    return ListTile(
+      leading: Icon(Icons.person),
+      title: TextField(
+        decoration: InputDecoration(
+          labelText: 'Cliente',
+          hintText: 'Ingrese el código del cliente',
+        ),
+        onChanged: (value) {
+          setState(() {
+            _clientCode = value;
+          });
+        },
+      ),
+    );
+  }
+
+  Widget _buildDateSelector() {
+    return Column(
+      children: [
+        ListTile(
+          leading: Icon(Icons.calendar_today),
+          title: Text('Desde: ${_startDate.toString().substring(0, 10)}'),
+          onTap: () => _selectDate(context, true),
+        ),
+        ListTile(
+          leading: Icon(Icons.calendar_today),
+          title: Text('Hasta: ${_endDate.toString().substring(0, 10)}'),
+          onTap: () => _selectDate(context, false),
+        ),
       ],
-      rows: _orders
-          .map((order) => DataRow(cells: [
-                DataCell(Text(order.srorden.toString())),
-                DataCell(Text(order.codcliente)),
-                DataCell(Text(order.fecha)),
-              ]))
-          .toList(),
+    );
+  }
+
+  Widget _buildStateSelector() {
+    return ListTile(
+      leading: Icon(Icons.filter_list),
+      title: DropdownButton<String>(
+        value: _selectedState,
+        items: _states.map((String value) {
+          return DropdownMenuItem<String>(
+            value: value,
+            child: Text(value),
+          );
+        }).toList(),
+        onChanged: (newValue) {
+          setState(() {
+            _selectedState = newValue!;
+          });
+        },
+      ),
+    );
+  }
+
+  Widget _buildShowButton() {
+    return ElevatedButton(
+      onPressed: _fetchOrders,
+      child: Text('Mostrar'),
+    );
+  }
+
+  Widget _buildOrderList() {
+    if (_orders.isEmpty) {
+      return Center(child: Text('No orders found'));
+    }
+
+    return ListView.builder(
+      shrinkWrap: true,
+      itemCount: _orders.length,
+      itemBuilder: (context, index) {
+        final order = _orders[index];
+        return Card(
+          margin: EdgeInsets.all(8),
+          child: ExpansionTile(
+            title: Text('Pedido #: ${order.srorden} - Fecha: ${order.fecha}'),
+            subtitle:
+                Text('Cliente: ${order.nombre} - Total: \$${order.total}'),
+            children: order.detalles.map((detail) {
+              return ListTile(
+                title: Text('${detail.nombre}'),
+                subtitle: Text(
+                    'Cantidad: ${detail.cantidad} - Precio: \$${detail.precio}'),
+              );
+            }).toList(),
+          ),
+        );
+      },
     );
   }
 }
@@ -131,14 +215,78 @@ class Order {
   final int srorden;
   final String codcliente;
   final String fecha;
+  final String estado;
+  final double? descuento;
+  final double? impuesto;
+  final double? total;
+  final String nombre;
+  final String ordenEstado;
+  final List<OrderDetail> detalles;
 
-  Order({required this.srorden, required this.codcliente, required this.fecha});
+  Order({
+    required this.srorden,
+    required this.codcliente,
+    required this.fecha,
+    required this.estado,
+    this.descuento,
+    this.impuesto,
+    this.total,
+    required this.nombre,
+    required this.ordenEstado,
+    required this.detalles,
+  });
 
   factory Order.fromJson(Map<String, dynamic> json) {
+    var detallesJson = json['detalles'] as List;
+    List<OrderDetail> detallesList =
+        detallesJson.map((i) => OrderDetail.fromJson(i)).toList();
+
     return Order(
       srorden: json['srorden'],
       codcliente: json['codcliente'],
       fecha: json['fecha'],
+      estado: json['estado'],
+      descuento: (json['descuento'] ?? 0).toDouble(),
+      impuesto: (json['impuesto'] ?? 0).toDouble(),
+      total: (json['total'] ?? 0).toDouble(),
+      nombre: json['nombre'],
+      ordenEstado: json['orden_estado'],
+      detalles: detallesList,
+    );
+  }
+}
+
+class OrderDetail {
+  final int numlinea;
+  final String codproducto;
+  final int cantidad;
+  final double precio;
+  final double subtotal;
+  final double impuesto;
+  final double total;
+  final String nombre;
+
+  OrderDetail({
+    required this.numlinea,
+    required this.codproducto,
+    required this.cantidad,
+    required this.precio,
+    required this.subtotal,
+    required this.impuesto,
+    required this.total,
+    required this.nombre,
+  });
+
+  factory OrderDetail.fromJson(Map<String, dynamic> json) {
+    return OrderDetail(
+      numlinea: json['numlinea'],
+      codproducto: json['codproducto'],
+      cantidad: json['cantidad'],
+      precio: (json['precio'] ?? 0).toDouble(),
+      subtotal: (json['subtotal'] ?? 0).toDouble(),
+      impuesto: (json['impuesto'] ?? 0).toDouble(),
+      total: (json['total'] ?? 0).toDouble(),
+      nombre: json['nombre'],
     );
   }
 }
