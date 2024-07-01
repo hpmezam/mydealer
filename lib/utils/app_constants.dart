@@ -2,8 +2,9 @@ import 'package:mydealer/localization/models/language_model.dart';
 import 'package:mydealer/utils/images.dart';
 
 class AppConstants {
-  static const String googleMapsApiKey = "AIzaSyDy9dRTRDBConVlFlejv-GBFnSKsabAFEU";
-  static const String appName = 'MyDe@ler - MEGADESA';
+  static const String googleMapsApiKey =
+      "AIzaSyDy9dRTRDBConVlFlejv-GBFnSKsabAFEU";
+  static const String appName = 'MyDe@ler';
   static const String appVersion = '1.0';
   static const String companyName = 'myDe@ler';
   static const String baseUrl = 'http://home.mydealer.ec:8000';

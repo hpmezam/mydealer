@@ -12,7 +12,6 @@ class HomePage extends StatelessWidget {
     String? codruta = prefs.getString('codruta');
     return {'nombre': nombre, 'login': login, 'codruta': codruta};
   }
-  
 
   @override
   Widget build(BuildContext context) {
@@ -27,7 +26,7 @@ class HomePage extends StatelessWidget {
                 return Card(
                   child: Padding(
                       padding: const EdgeInsets.only(
-                          top: Dimensions.paddingSizeDefault),
+                          top: Dimensions.paddingSizeButton),
                       child: Column(
                         children: [
                           ListTile(
@@ -51,8 +50,10 @@ class HomePage extends StatelessWidget {
           },
         ),
         GridView.count(
-          shrinkWrap: true,
+          physics: const NeverScrollableScrollPhysics(),
           crossAxisCount: 2,
+          childAspectRatio: (1 / .65),
+          shrinkWrap: true,
           padding: const EdgeInsets.all(4),
           mainAxisSpacing: 4,
           crossAxisSpacing: 4,
