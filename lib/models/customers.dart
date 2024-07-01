@@ -37,4 +37,60 @@ class Customer {
       saldoPendiente: double.tryParse(json['saldopendiente'].toString()) ?? 0.0,
     );
   }
+
+    Map<String, dynamic> toMap() {
+    return {
+      'codrutadet': codRutaDet,
+      'codcliente': codCliente,
+      'coddireccionenvio': codDireccionEnvio,
+      'cedularuc': cedulaRuc,
+      'cliente_nombre': nombreCliente,
+      'direccion': direccion,
+      'latitud': latitud,
+      'longitud': longitud,
+      'limitecredito': limiteCredito,
+      'saldopendiente': saldoPendiente,
+    };
+  }
+
+  static Customer fromMap(Map<String, dynamic> map) {
+    return Customer(
+      codRutaDet: map['codrutadet'],
+      codCliente: map['codcliente'],
+      codDireccionEnvio: map['coddireccionenvio'],
+      cedulaRuc: map['cedularuc'],
+      nombreCliente: map['cliente_nombre'],
+      direccion: map['direccion'],
+      latitud: map['latitud'] != null ? map['latitud'] as double : null,
+      longitud: map['longitud'] != null ? map['longitud'] as double : null,
+      limiteCredito: map['limitecredito'] as double,
+      saldoPendiente: map['saldopendiente'] as double,
+    );
+  }
+
+    Customer copy({
+    int? codRutaDet,
+    String? codCliente,
+    String? codDireccionEnvio,
+    String? cedulaRuc,
+    String? nombreCliente,
+    String? direccion,
+    double? latitud,
+    double? longitud,
+    double? limiteCredito,
+    double? saldoPendiente,
+  }) {
+    return Customer(
+      codRutaDet: codRutaDet ?? this.codRutaDet,
+      codCliente: codCliente ?? this.codCliente,
+      codDireccionEnvio: codDireccionEnvio ?? this.codDireccionEnvio,
+      cedulaRuc: cedulaRuc ?? this.cedulaRuc,
+      nombreCliente: nombreCliente ?? this.nombreCliente,
+      direccion: direccion ?? this.direccion,
+      latitud: latitud ?? this.latitud,
+      longitud: longitud ?? this.longitud,
+      limiteCredito: limiteCredito ?? this.limiteCredito,
+      saldoPendiente: saldoPendiente ?? this.saldoPendiente,
+    );
+  }
 }

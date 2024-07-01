@@ -1,4 +1,5 @@
 import 'package:mydealer/localization/models/language_model.dart';
+import 'package:mydealer/services/auth_service.dart';
 import 'package:mydealer/utils/images.dart';
 
 class AppConstants {
@@ -8,7 +9,7 @@ class AppConstants {
   static const String companyName = 'myDe@ler';
   static const String baseUrl = 'http://home.mydealer.ec:8000';
   static const String loginUri = '/api/login';
-  static const String curtomerUri = "/api/vendedor/clientes/'262'";
+  static const String curtomerUri = "/api/vendedor/clientes/";
   static const String numberOrders = "/api/vendedor/numeroPedidos";
   static const String numberPayment = "/api/vendedor/numeroCobros";
   static const String configUri = '/api/v1/config';
