@@ -79,6 +79,7 @@ class AuthService {
       await prefs.setString('codruta', codruta);
       String codvendedor = dataUsuario['codvendedor'];
       await prefs.setString('codvendedor', codvendedor);
+      print(codvendedor);
       return true;
     } catch (e) {
       print('Failed to save user data: $e');

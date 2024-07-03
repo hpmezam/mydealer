@@ -1,7 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:location/location.dart' as loc; // Alias para location
-import 'package:mydealer/views/login.dart';
-import 'package:permission_handler/permission_handler.dart' as perm; // Alias para permission_handler
+import 'package:mydealer/views/auth_screen.dart';
+// import 'package:mydealer/views/login.dart';
+import 'package:permission_handler/permission_handler.dart'
+    as perm; // Alias para permission_handler
 
 class CheckGpsPermissions extends StatefulWidget {
   const CheckGpsPermissions({super.key});
@@ -46,7 +48,7 @@ class _CheckGpsPermissionsState extends State<CheckGpsPermissions> {
       if (permissionGranted == loc.PermissionStatus.granted) {
         // Navega a la pantalla de inicio de sesión
         Navigator.of(context).pushReplacement(
-          MaterialPageRoute(builder: (context) => LoginScreen()),
+          MaterialPageRoute(builder: (context) => AuthScreen()),
         );
       } else {
         // Si no se conceden los permisos, muestra un mensaje y vuelve a intentar
@@ -63,7 +65,8 @@ class _CheckGpsPermissionsState extends State<CheckGpsPermissions> {
       context: context,
       builder: (context) => AlertDialog(
         title: const Text('Permisos Denegados'),
-        content: const Text('Por favor, concede permisos de ubicación para continuar.'),
+        content: const Text(
+            'Por favor, concede permisos de ubicación para continuar.'),
         actions: [
           TextButton(
             onPressed: () {
@@ -101,7 +104,8 @@ class _CheckGpsPermissionsState extends State<CheckGpsPermissions> {
       context: context,
       builder: (context) => AlertDialog(
         title: const Text('Permisos Denegados'),
-        content: const Text('Por favor, habilite los permisos de ubicación desde la configuración de la aplicación.'),
+        content: const Text(
+            'Por favor, habilite los permisos de ubicación desde la configuración de la aplicación.'),
         actions: [
           TextButton(
             onPressed: () async {
