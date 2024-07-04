@@ -3,6 +3,7 @@ import 'package:connectivity_plus/connectivity_plus.dart';
 import 'package:http/http.dart' as http;
 import 'package:mydealer/dataBaseHelper/dbh_customer.dart';
 import 'package:mydealer/models/customers.dart';
+import 'package:mydealer/models/customersrutas.dart';
 import 'package:mydealer/utils/app_constants.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
@@ -32,6 +33,24 @@ class CustomerService {
           customersJson.map((json) => Customer.fromJson(json)).toList();
 
       return customers;
+    } catch (e) {
+      print('Error fetching customers from API: $e');
+      return [];
+    }
+  }
+  Future<List<CustomerRutas>> customerRutas() async {
+    try {
+      final SharedPreferences prefs = await SharedPreferences.getInstance();
+      String? codVendedor = prefs.getString('codvendedor');
+      String? codruta = prefs.getString('codruta');
+      final response = await http.get(Uri.parse('$baseUrl${codVendedor!}/${codruta!}'));
+      print('$baseUrl${codVendedor!}/${codruta!}');
+      final data = json.decode(response.body) as Map<String, dynamic>;
+      final List<dynamic> customersRutasJson = data['datos'] ?? [];
+      List<CustomerRutas> customersRutas =
+          customersRutasJson.map((json) => CustomerRutas.fromJson(json)).toList();
+
+      return customersRutas;
     } catch (e) {
       print('Error fetching customers from API: $e');
       return [];
