@@ -104,9 +104,12 @@ class _GoogleMapPageState extends State<GoogleMapPage> {
     final polylinePoints = PolylinePoints();
 
     final result = await polylinePoints.getRouteBetweenCoordinates(
-      AppConstants.googleMapsApiKey,
-      PointLatLng(currentPosition!.latitude, currentPosition!.longitude),
-      PointLatLng(widget.destination.latitude, widget.destination.longitude),
+      googleApiKey: AppConstants.googleMapsApiKey,
+      request: PolylineRequest(
+        origin: PointLatLng(currentPosition!.latitude, currentPosition!.longitude),
+        destination: PointLatLng(widget.destination.latitude, widget.destination.longitude),
+        mode: TravelMode.driving,
+      ),
     );
 
     if (result.points.isNotEmpty) {
@@ -119,8 +122,7 @@ class _GoogleMapPageState extends State<GoogleMapPage> {
     }
   }
 
-  Future<void> generatePolyLineFromPoints(
-      List<LatLng> polylineCoordinates) async {
+  void generatePolyLineFromPoints(List<LatLng> polylineCoordinates) {
     const id = PolylineId('polyline');
 
     final polyline = Polyline(
