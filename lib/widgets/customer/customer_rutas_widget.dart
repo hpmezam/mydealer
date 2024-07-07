@@ -16,7 +16,8 @@ class CustomerRutasWidget extends StatelessWidget {
       margin: const EdgeInsets.all(5.0),
       elevation: 5,
       child: ListTile(
-        title: Text('${customerRutas.codCliente} - ${customerRutas.nombreCliente}',
+        title: Text(
+            '${customerRutas.codCliente} - ${customerRutas.nombreCliente}',
             style: const TextStyle(fontWeight: FontWeight.bold)),
         subtitle: Padding(
           padding: const EdgeInsets.only(top: 8.0),
@@ -25,13 +26,16 @@ class CustomerRutasWidget extends StatelessWidget {
             children: <Widget>[
               Text(customerRutas.direccion),
               Text('Latitud: ${customerRutas.latitud}'),
-              Text('Longitud: ${customerRutas.longitud}'), 
+              Text('Longitud: ${customerRutas.longitud}'),
               Text('Límite Crédito: ${customerRutas.limiteCredito}'),
               Text('Saldo Disponible: ${customerRutas.saldoPendiente}'),
             ],
           ),
         ),
-       
+        trailing: IconButton(
+          icon: const Icon(Icons.location_on_outlined),
+          onPressed: () async {},
+        ),
       ),
     );
   }
