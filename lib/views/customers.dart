@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:mydealer/models/customers.dart';
+import 'package:mydealer/models/customersrutas.dart';
 import 'package:mydealer/services/customer_service.dart';
+import 'package:mydealer/widgets/customer/customer_rutas_widget.dart';
 import 'package:mydealer/widgets/customer/customer_widget.dart';
 
 
@@ -9,6 +11,7 @@ class CustomersPage extends StatefulWidget {
 
   @override
   _CustomersPageState createState() => _CustomersPageState();
+  
 }
 
 class _CustomersPageState extends State<CustomersPage>
@@ -17,14 +20,17 @@ class _CustomersPageState extends State<CustomersPage>
   bool _isSearching = false;
   final TextEditingController _searchController = TextEditingController();
   List<Customer> customers = [];
+  List<CustomerRutas> customersRutas = [];
   bool _isLoading = true;
   List<Customer> allCustomers = [];
   List<Customer> filteredCustomers = [];
+  List<CustomerRutas> filteredCustomersRutas = [];
 
   @override
   void initState() {
     super.initState();
     _tabController = TabController(length: 3, vsync: this);
+    _loadCustomersRutas();
     _loadCustomers();
   }
 
@@ -34,6 +40,22 @@ class _CustomersPageState extends State<CustomersPage>
       List<Customer> loadedCustomers = await customerService.fetchCustomers();
       setState(() {
         customers = loadedCustomers;
+        _isLoading = false;
+      });
+    } catch (e) {
+      print('Failed to load customers: $e');
+      setState(() {
+        _isLoading = false;
+      });
+    }
+  }
+  Future<void> _loadCustomersRutas() async {
+    CustomerService customerService = CustomerService();
+    try {
+      List<CustomerRutas> loadedCustomersRutas = await customerService.customerRutas();
+      setState(() {
+        customersRutas = loadedCustomersRutas;
+        print(customersRutas);
         _isLoading = false;
       });
     } catch (e) {
@@ -93,7 +115,7 @@ class _CustomersPageState extends State<CustomersPage>
           : TabBarView(
               controller: _tabController,
               children: [
-                _buildCustomerList("Rutas"),
+                _buildCustomeRutasrList("Rutas"),
                 _buildCustomerList("Todos"),
                 _buildCustomerList("Agenda"),
               ],
@@ -107,6 +129,16 @@ class _CustomersPageState extends State<CustomersPage>
       itemCount: filteredCustomers.length,
       itemBuilder: (context, index) =>
           CustomerWidget(customer: filteredCustomers[index]),
+    );
+  }
+  Widget _buildCustomeRutasrList(String filter) {
+    //hacer debug;
+    List<CustomerRutas> filteredCustomersRutas = customersRutas;
+    print(filteredCustomersRutas);
+    return ListView.builder(
+      itemCount: filteredCustomersRutas.length,
+      itemBuilder: (context, index) =>
+          CustomerRutasWidget(customerRutas: filteredCustomersRutas[index]),
     );
   }
 
