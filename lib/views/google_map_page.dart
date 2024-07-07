@@ -5,10 +5,11 @@ import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:location/location.dart';
 import 'package:mydealer/utils/app_constants.dart';
 import 'package:mydealer/models/customers.dart';
+import 'package:mydealer/models/customersrutas.dart';
 
 class GoogleMapPage extends StatefulWidget {
   final LatLng destination;
-  final Customer customer;
+  final dynamic customer;
 
   const GoogleMapPage({super.key, required this.destination, required this.customer});
 
@@ -57,98 +58,105 @@ class _GoogleMapPageState extends State<GoogleMapPage> {
   }
 
   @override
-  Widget build(BuildContext context) => Scaffold(
-    appBar: AppBar(
-      title: const Text("Ubicación"),
-    ),
-    body: Column(
-      children: [
-        Expanded(
-          flex: 2,
-          child: currentPosition == null
-              ? const Center(child: CircularProgressIndicator())
-              : GoogleMap(
-            initialCameraPosition: CameraPosition(
-              target: widget.destination,
-              zoom: 13,
-            ),
-            markers: {
-              if (currentPosition != null)
+  Widget build(BuildContext context) {
+    final isCustomerRutas = widget.customer is CustomerRutas;
+    final customer = widget.customer;
+
+    return Scaffold(
+      appBar: AppBar(
+        title: const Text("Ubicación"),
+      ),
+      body: Column(
+        children: [
+          Expanded(
+            flex: 2,
+            child: currentPosition == null
+                ? const Center(child: CircularProgressIndicator())
+                : GoogleMap(
+              initialCameraPosition: CameraPosition(
+                target: widget.destination,
+                zoom: 13,
+              ),
+              markers: {
+                if (currentPosition != null)
+                  Marker(
+                    markerId: const MarkerId('currentLocation'),
+                    icon: carIcon ?? BitmapDescriptor.defaultMarker,
+                    position: currentPosition!,
+                    infoWindow: const InfoWindow(
+                      title: 'Mi Ubicación',
+                      snippet: 'Esta es tu ubicación actual',
+                    ),
+                  ),
                 Marker(
-                  markerId: const MarkerId('currentLocation'),
-                  icon: carIcon ?? BitmapDescriptor.defaultMarker,
-                  position: currentPosition!,
+                  markerId: const MarkerId('destinationLocation'),
+                  icon: destinationIcon ?? BitmapDescriptor.defaultMarker,
+                  position: widget.destination,
                   infoWindow: const InfoWindow(
-                    title: 'Mi Ubicación',
-                    snippet: 'Esta es tu ubicación actual',
+                    title: 'Destino',
+                    snippet: 'Este es tu destino',
                   ),
                 ),
-              Marker(
-                markerId: const MarkerId('destinationLocation'),
-                icon: destinationIcon ?? BitmapDescriptor.defaultMarker,
-                position: widget.destination,
-                infoWindow: const InfoWindow(
-                  title: 'Destino',
-                  snippet: 'Este es tu destino',
-                ),
-              ),
-            },
-            polylines: Set<Polyline>.of(polylines.values),
-            onMapCreated: (GoogleMapController controller) {
-              _controller.complete(controller);
-              _setCameraToFitBounds();
-            },
-          ),
-        ),
-        Expanded(
-          flex: 1,
-          child: Padding(
-            padding: const EdgeInsets.all(16.0),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text(
-                  'Código Cliente - ${widget.customer.codCliente} ',
-                  style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 18),
-                ),
-                Text('${widget.customer.nombreCliente}',
-                    style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 18),
-                ),
-                const SizedBox(height: 12),
-                Text('Dirección: ${widget.customer.direccion}'),
-                Text('Límite Crédito: ${widget.customer.limiteCredito}'),
-                Text('Saldo Disponible: ${widget.customer.saldoPendiente}'),
-                const Spacer(),
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                  children: [
-                    ElevatedButton(
-                      onPressed: () {
-                        // Acción para "Entregado"
-                        ScaffoldMessenger.of(context).showSnackBar(
-                          const SnackBar(content: Text('Pedido entregado.')),
-                        );
-                      },
-                      child: const Text('Entregado'),
-                    ),
-                    ElevatedButton(
-                      onPressed: () {
-                        // Acción para "No entregado"
-                        ScaffoldMessenger.of(context).showSnackBar(
-                          const SnackBar(content: Text('Pedido no entregado.')),
-                        );
-                      },
-                      child: const Text('No entregado'),
-                    ),
-                  ],
-                )
-              ],
+              },
+              polylines: Set<Polyline>.of(polylines.values),
+              onMapCreated: (GoogleMapController controller) {
+                _controller.complete(controller);
+                _setCameraToFitBounds();
+              },
             ),
           ),
-        ),
-      ],
-    ),
-  );
+          Expanded(
+            flex: 1,
+            child: SingleChildScrollView(
+              child: Padding(
+                padding: const EdgeInsets.all(16.0),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      'Código Cliente - ${isCustomerRutas ? (customer as CustomerRutas).codCliente : (customer as Customer).codCliente} ',
+                      style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 16),
+                    ),
+                    Text(
+                      isCustomerRutas ? (customer as CustomerRutas).nombreCliente : (customer as Customer).nombreCliente,
+                      style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 16),
+                    ),
+                    const SizedBox(height: 12),
+                    Text('Dirección: ${isCustomerRutas ? (customer as CustomerRutas).direccion : (customer as Customer).direccion}'),
+                    Text('Límite Crédito: ${isCustomerRutas ? (customer as CustomerRutas).limiteCredito : (customer as Customer).limiteCredito}'),
+                    Text('Saldo Disponible: ${isCustomerRutas ? (customer as CustomerRutas).saldoPendiente : (customer as Customer).saldoPendiente}'),
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                      children: [
+                        ElevatedButton(
+                          onPressed: () {
+                            // Acción para "Entregado"
+                            ScaffoldMessenger.of(context).showSnackBar(
+                              const SnackBar(content: Text('Pedido entregado.')),
+                            );
+                          },
+                          child: const Text('Entregado'),
+                        ),
+                        ElevatedButton(
+                          onPressed: () {
+                            // Acción para "No entregado"
+                            ScaffoldMessenger.of(context).showSnackBar(
+                              const SnackBar(content: Text('Pedido no entregado.')),
+                            );
+                          },
+                          child: const Text('No entregado'),
+                        ),
+                      ],
+                    )
+                  ],
+                ),
+              ),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
 
   Future<void> fetchLocationUpdates() async {
     bool serviceEnabled;

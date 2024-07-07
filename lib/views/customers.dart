@@ -5,13 +5,9 @@ import 'package:mydealer/services/customer_service.dart';
 import 'package:mydealer/widgets/customer/customer_rutas_widget.dart';
 import 'package:mydealer/widgets/customer/customer_widget.dart';
 
-
 class CustomersPage extends StatefulWidget {
-
-
   @override
   _CustomersPageState createState() => _CustomersPageState();
-  
 }
 
 class _CustomersPageState extends State<CustomersPage>
@@ -40,6 +36,7 @@ class _CustomersPageState extends State<CustomersPage>
       List<Customer> loadedCustomers = await customerService.fetchCustomers();
       setState(() {
         customers = loadedCustomers;
+        allCustomers = loadedCustomers;
         _isLoading = false;
       });
     } catch (e) {
@@ -49,13 +46,13 @@ class _CustomersPageState extends State<CustomersPage>
       });
     }
   }
+
   Future<void> _loadCustomersRutas() async {
     CustomerService customerService = CustomerService();
     try {
       List<CustomerRutas> loadedCustomersRutas = await customerService.customerRutas();
       setState(() {
         customersRutas = loadedCustomersRutas;
-        print(customersRutas);
         _isLoading = false;
       });
     } catch (e) {
@@ -72,21 +69,21 @@ class _CustomersPageState extends State<CustomersPage>
       appBar: AppBar(
         title: _isSearching
             ? TextField(
-                controller: _searchController,
-                autofocus: true,
-                decoration: const InputDecoration(
-                  hintText: 'Buscar clientes...',
-                  border: InputBorder.none,
-                ),
-                onChanged: (value) => _filterCustomers(value),
-              )
+          controller: _searchController,
+          autofocus: true,
+          decoration: const InputDecoration(
+            hintText: 'Buscar clientes...',
+            border: InputBorder.none,
+          ),
+          onChanged: (value) => _filterCustomers(value),
+        )
             : const Text(
-                "Clientes",
-                style: TextStyle(
-                  color: Colors.black87,
-                  fontWeight: FontWeight.bold,
-                ),
-              ),
+          "Clientes",
+          style: TextStyle(
+            color: Colors.black87,
+            fontWeight: FontWeight.bold,
+          ),
+        ),
         actions: [
           IconButton(
             icon: Icon(_isSearching ? Icons.close : Icons.search),
@@ -111,15 +108,15 @@ class _CustomersPageState extends State<CustomersPage>
         ),
       ),
       body: _isLoading
-          ? Center(child: CircularProgressIndicator())
+          ? const Center(child: CircularProgressIndicator())
           : TabBarView(
-              controller: _tabController,
-              children: [
-                _buildCustomeRutasrList("Rutas"),
-                _buildCustomerList("Todos"),
-                _buildCustomerList("Agenda"),
-              ],
-            ),
+        controller: _tabController,
+        children: [
+          _buildCustomerRutasList(),
+          _buildCustomerList("Todos"),
+          _buildCustomerList("Agenda"),
+        ],
+      ),
     );
   }
 
@@ -131,39 +128,31 @@ class _CustomersPageState extends State<CustomersPage>
           CustomerWidget(customer: filteredCustomers[index]),
     );
   }
-  Widget _buildCustomeRutasrList(String filter) {
-    //hacer debug;
-    List<CustomerRutas> filteredCustomersRutas = customersRutas;
-    print(filteredCustomersRutas);
+
+  Widget _buildCustomerRutasList() {
     return ListView.builder(
-      itemCount: filteredCustomersRutas.length,
+      itemCount: customersRutas.length,
       itemBuilder: (context, index) =>
-          CustomerRutasWidget(customerRutas: filteredCustomersRutas[index]),
+          CustomerRutasWidget(customerRutas: customersRutas[index]),
     );
   }
 
   List<Customer> _filterLogic(List<Customer> customers, String filter) {
     switch (filter) {
       case "Rutas":
-        return customers
-            .where((customer) => customer.limiteCredito > 0)
-            .toList();
+        return customers.where((customer) => customer.limiteCredito > 0).toList();
       case "Todos":
         return customers;
       case "Agenda":
-        return customers
-            .where((customer) => customer.saldoPendiente > 0)
-            .toList();
+        return customers.where((customer) => customer.saldoPendiente > 0).toList();
       default:
         return customers;
     }
   }
 
   void _filterCustomers(String query) {
-    List<Customer> results = customers.where((customer) {
-      return customer.nombreCliente
-              .toLowerCase()
-              .contains(query.toLowerCase()) ||
+    List<Customer> results = allCustomers.where((customer) {
+      return customer.nombreCliente.toLowerCase().contains(query.toLowerCase()) ||
           customer.codCliente.toLowerCase().contains(query.toLowerCase());
     }).toList();
     setState(() {
