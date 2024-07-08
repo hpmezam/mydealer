@@ -1,4 +1,4 @@
-class Customer {
+class CustomerRutas {
   final int codRutaDet;
   final String codCliente;
   final String codDireccionEnvio;
@@ -10,7 +10,7 @@ class Customer {
   final double limiteCredito;
   final double saldoPendiente;
 
-  Customer({
+  CustomerRutas({
     required this.codRutaDet,
     required this.codCliente,
     required this.codDireccionEnvio,
@@ -23,26 +23,22 @@ class Customer {
     required this.saldoPendiente,
   });
 
-  factory Customer.fromJson(Map<String, dynamic> json) {
-    return Customer(
+  factory CustomerRutas.fromJson(Map<String, dynamic> json) {
+    return CustomerRutas(
       codRutaDet: json['codrutadet'] ?? 0,
       codCliente: json['codcliente']?.replaceAll("'", "") ?? '',
       codDireccionEnvio: json['coddireccionenvio']?.replaceAll("'", "") ?? '',
       cedulaRuc: json['cedularuc']?.replaceAll("'", "") ?? '',
       nombreCliente: json['cliente_nombre']?.replaceAll("'", "") ?? '',
       direccion: json['direccion']?.replaceAll("'", "") ?? '',
-      latitud: json['latitud'] != null
-          ? double.tryParse(json['latitud'].toString())
-          : null,
-      longitud: json['longitud'] != null
-          ? double.tryParse(json['longitud'].toString())
-          : null,
+      latitud: json['latitud'] != null ? double.tryParse(json['latitud'].toString()) : null,
+      longitud: json['longitud'] != null ? double.tryParse(json['longitud'].toString()) : null,
       limiteCredito: double.tryParse(json['limitecredito'].toString()) ?? 0.0,
       saldoPendiente: double.tryParse(json['saldopendiente'].toString()) ?? 0.0,
     );
   }
 
-  Map<String, dynamic> toMap() {
+    Map<String, dynamic> toMap() {
     return {
       'codrutadet': codRutaDet,
       'codcliente': codCliente,
@@ -57,8 +53,8 @@ class Customer {
     };
   }
 
-  static Customer fromMap(Map<String, dynamic> map) {
-    return Customer(
+  static CustomerRutas fromMap(Map<String, dynamic> map) {
+    return CustomerRutas(
       codRutaDet: map['codrutadet'],
       codCliente: map['codcliente'],
       codDireccionEnvio: map['coddireccionenvio'],
@@ -72,7 +68,7 @@ class Customer {
     );
   }
 
-  Customer copy({
+    CustomerRutas copy({
     int? codRutaDet,
     String? codCliente,
     String? codDireccionEnvio,
@@ -84,7 +80,7 @@ class Customer {
     double? limiteCredito,
     double? saldoPendiente,
   }) {
-    return Customer(
+    return CustomerRutas(
       codRutaDet: codRutaDet ?? this.codRutaDet,
       codCliente: codCliente ?? this.codCliente,
       codDireccionEnvio: codDireccionEnvio ?? this.codDireccionEnvio,

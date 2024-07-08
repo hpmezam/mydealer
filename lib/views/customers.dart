@@ -1,14 +1,15 @@
 import 'package:flutter/material.dart';
+import 'package:mydealer/models/allCustomers.dart';
 import 'package:mydealer/models/customers.dart';
+import 'package:mydealer/models/customersrutas.dart';
 import 'package:mydealer/services/customer_service.dart';
+import 'package:mydealer/widgets/customer/customer_rutas_widget.dart';
 import 'package:mydealer/widgets/customer/customer_widget.dart';
 
-
 class CustomersPage extends StatefulWidget {
-
-
   @override
   _CustomersPageState createState() => _CustomersPageState();
+  
 }
 
 class _CustomersPageState extends State<CustomersPage>
@@ -17,23 +18,62 @@ class _CustomersPageState extends State<CustomersPage>
   bool _isSearching = false;
   final TextEditingController _searchController = TextEditingController();
   List<Customer> customers = [];
+  List<CustomerRutas> customersRutas = [];
   bool _isLoading = true;
-  List<Customer> allCustomers = [];
+  List<AllCustomers> allCustomers = [];
   List<Customer> filteredCustomers = [];
+  List<CustomerRutas> filteredCustomersRutas = [];
 
   @override
   void initState() {
     super.initState();
     _tabController = TabController(length: 3, vsync: this);
+    _loadCustomersRutas();
     _loadCustomers();
+    _loadAllCustomers();
+  }
+
+  Future<void> _loadAllCustomers() async {
+    CustomerService customerService = CustomerService();
+    try {
+      List<AllCustomers> loadedAllCustomers =
+          await customerService.fetchAllCustomers();
+      setState(() {
+        print('Datooooos cargados');
+        allCustomers = loadedAllCustomers;
+        _isLoading = false;
+      });
+    } catch (e) {
+      print('Failed to load customers: $e');
+      setState(() {
+        _isLoading = false;
+      });
+    }
   }
 
   Future<void> _loadCustomers() async {
     CustomerService customerService = CustomerService();
     try {
+      print('Entra a_loadCustomers');
       List<Customer> loadedCustomers = await customerService.fetchCustomers();
       setState(() {
         customers = loadedCustomers;
+        _isLoading = false;
+      });
+    } catch (e) {
+      print('Failed to load customers: $e');
+      setState(() {
+        _isLoading = false;
+      });
+    }
+  }
+  Future<void> _loadCustomersRutas() async {
+    CustomerService customerService = CustomerService();
+    try {
+      List<CustomerRutas> loadedCustomersRutas = await customerService.customerRutas();
+      setState(() {
+        customersRutas = loadedCustomersRutas;
+        print(customersRutas);
         _isLoading = false;
       });
     } catch (e) {
@@ -93,11 +133,20 @@ class _CustomersPageState extends State<CustomersPage>
           : TabBarView(
               controller: _tabController,
               children: [
-                _buildCustomerList("Rutas"),
-                _buildCustomerList("Todos"),
+                _buildCustomeRutasrList("Rutas"),
+                _buildAllCustomerList(allCustomers),
                 _buildCustomerList("Agenda"),
               ],
             ),
+    );
+  }
+
+  Widget _buildAllCustomerList(List<AllCustomers> allCustomers) {
+    print('ingresoooo a todos los clientes _buildAllCustomerList');
+    return ListView.builder(
+      itemCount: allCustomers.length,
+      itemBuilder: (context, index) =>
+          AllCustomerWidget(allCustomers: allCustomers[index]),
     );
   }
 
@@ -109,6 +158,16 @@ class _CustomersPageState extends State<CustomersPage>
           CustomerWidget(customer: filteredCustomers[index]),
     );
   }
+  Widget _buildCustomeRutasrList(String filter) {
+    //hacer debug;
+    List<CustomerRutas> filteredCustomersRutas = customersRutas;
+    print(filteredCustomersRutas);
+    return ListView.builder(
+      itemCount: filteredCustomersRutas.length,
+      itemBuilder: (context, index) =>
+          CustomerRutasWidget(customerRutas: filteredCustomersRutas[index]),
+    );
+  }
 
   List<Customer> _filterLogic(List<Customer> customers, String filter) {
     switch (filter) {
@@ -116,8 +175,6 @@ class _CustomersPageState extends State<CustomersPage>
         return customers
             .where((customer) => customer.limiteCredito > 0)
             .toList();
-      case "Todos":
-        return customers;
       case "Agenda":
         return customers
             .where((customer) => customer.saldoPendiente > 0)
