@@ -6,12 +6,14 @@ import 'package:location/location.dart';
 import 'package:mydealer/utils/app_constants.dart';
 import 'package:mydealer/models/customers.dart';
 import 'package:mydealer/models/customersrutas.dart';
+import 'package:url_launcher/url_launcher.dart';
 
 class GoogleMapPage extends StatefulWidget {
   final LatLng destination;
   final dynamic customer;
 
-  const GoogleMapPage({super.key, required this.destination, required this.customer});
+  const GoogleMapPage(
+      {super.key, required this.destination, required this.customer});
 
   @override
   State<GoogleMapPage> createState() => _GoogleMapPageState();
@@ -22,7 +24,6 @@ class _GoogleMapPageState extends State<GoogleMapPage> {
   LatLng? currentPosition;
   Map<PolylineId, Polyline> polylines = {};
   Completer<GoogleMapController> _controller = Completer();
-  BitmapDescriptor? carIcon;
   BitmapDescriptor? destinationIcon;
   StreamSubscription<LocationData>? _locationSubscription;
 
@@ -31,10 +32,6 @@ class _GoogleMapPageState extends State<GoogleMapPage> {
     super.initState();
     WidgetsBinding.instance.addPostFrameCallback((_) async {
       await initializeMap();
-      carIcon = await BitmapDescriptor.fromAssetImage(
-        const ImageConfiguration(size: Size(48, 48)),
-        'assets/images/car.png',
-      );
       destinationIcon = await BitmapDescriptor.fromAssetImage(
         const ImageConfiguration(size: Size(48, 48)),
         'assets/images/destination.png',
@@ -50,11 +47,6 @@ class _GoogleMapPageState extends State<GoogleMapPage> {
 
   Future<void> initializeMap() async {
     await fetchLocationUpdates();
-    final coordinates = await fetchPolylinePoints();
-    if (coordinates.isNotEmpty) {
-      generatePolyLineFromPoints(coordinates);
-      _setCameraToFitBounds();
-    }
   }
 
   @override
@@ -68,26 +60,14 @@ class _GoogleMapPageState extends State<GoogleMapPage> {
       ),
       body: Column(
         children: [
-          Expanded(
-            flex: 2,
-            child: currentPosition == null
-                ? const Center(child: CircularProgressIndicator())
-                : GoogleMap(
+          Container(
+            height: MediaQuery.of(context).size.height * 0.4,
+            child: GoogleMap(
               initialCameraPosition: CameraPosition(
                 target: widget.destination,
-                zoom: 13,
+                zoom: 16, // Nivel de zoom ajustado para ver más cerca
               ),
               markers: {
-                if (currentPosition != null)
-                  Marker(
-                    markerId: const MarkerId('currentLocation'),
-                    icon: carIcon ?? BitmapDescriptor.defaultMarker,
-                    position: currentPosition!,
-                    infoWindow: const InfoWindow(
-                      title: 'Mi Ubicación',
-                      snippet: 'Esta es tu ubicación actual',
-                    ),
-                  ),
                 Marker(
                   markerId: const MarkerId('destinationLocation'),
                   icon: destinationIcon ?? BitmapDescriptor.defaultMarker,
@@ -98,57 +78,119 @@ class _GoogleMapPageState extends State<GoogleMapPage> {
                   ),
                 ),
               },
-              polylines: Set<Polyline>.of(polylines.values),
               onMapCreated: (GoogleMapController controller) {
                 _controller.complete(controller);
-                _setCameraToFitBounds();
               },
             ),
+          ),
+          ElevatedButton(
+            onPressed: () {
+              final url =
+                  'https://www.google.com/maps/search/?api=1&query=${widget.destination.latitude},${widget.destination.longitude}';
+              _launchURL(url);
+            },
+            child: const Text('Abrir en Google Maps'),
           ),
           Expanded(
             flex: 1,
             child: SingleChildScrollView(
               child: Padding(
                 padding: const EdgeInsets.all(16.0),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text(
-                      'Código Cliente - ${isCustomerRutas ? (customer as CustomerRutas).codCliente : (customer as Customer).codCliente} ',
-                      style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 16),
-                    ),
-                    Text(
-                      isCustomerRutas ? (customer as CustomerRutas).nombreCliente : (customer as Customer).nombreCliente,
-                      style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 16),
-                    ),
-                    const SizedBox(height: 12),
-                    Text('Dirección: ${isCustomerRutas ? (customer as CustomerRutas).direccion : (customer as Customer).direccion}'),
-                    Text('Límite Crédito: ${isCustomerRutas ? (customer as CustomerRutas).limiteCredito : (customer as Customer).limiteCredito}'),
-                    Text('Saldo Disponible: ${isCustomerRutas ? (customer as CustomerRutas).saldoPendiente : (customer as Customer).saldoPendiente}'),
-                    Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                child: Container(
+                  decoration: BoxDecoration(
+                    color: Colors.white,
+                    borderRadius: BorderRadius.circular(16),
+                    boxShadow: [
+                      BoxShadow(
+                        color: Colors.grey.withOpacity(0.5),
+                        spreadRadius: 5,
+                        blurRadius: 7,
+                        offset: Offset(0, 3),
+                      ),
+                    ],
+                  ),
+                  child: Padding(
+                    padding: const EdgeInsets.all(16.0),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        ElevatedButton(
-                          onPressed: () {
-                            // Acción para "Entregado"
-                            ScaffoldMessenger.of(context).showSnackBar(
-                              const SnackBar(content: Text('Pedido entregado.')),
-                            );
-                          },
-                          child: const Text('Entregado'),
+                        Text(
+                          'Código Cliente - ${isCustomerRutas ? (customer as CustomerRutas).codCliente : (customer as Customer).codCliente} ',
+                          style: const TextStyle(
+                              fontWeight: FontWeight.bold, fontSize: 16),
                         ),
-                        ElevatedButton(
-                          onPressed: () {
-                            // Acción para "No entregado"
-                            ScaffoldMessenger.of(context).showSnackBar(
-                              const SnackBar(content: Text('Pedido no entregado.')),
-                            );
-                          },
-                          child: const Text('No entregado'),
+                        Text(
+                          isCustomerRutas
+                              ? (customer as CustomerRutas).nombreCliente
+                              : (customer as Customer).nombreCliente,
+                          style: const TextStyle(
+                              fontWeight: FontWeight.bold, fontSize: 16),
                         ),
+                        const SizedBox(height: 12),
+                        Text(
+                          'Dirección: ${isCustomerRutas ? (customer as CustomerRutas).direccion : (customer as Customer).direccion}',
+                        ),
+                        Text(
+                          'Límite Crédito: ${isCustomerRutas ? (customer as CustomerRutas).limiteCredito : (customer as Customer).limiteCredito}',
+                        ),
+                        Text(
+                          'Saldo Disponible: ${isCustomerRutas ? (customer as CustomerRutas).saldoPendiente : (customer as Customer).saldoPendiente}',
+                        ),
+                        const SizedBox(height: 12),
+                        Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                          children: [
+                            ElevatedButton(
+                              onPressed: () {
+                                // Acción para "Entregado"
+                                ScaffoldMessenger.of(context).showSnackBar(
+                                  SnackBar(
+                                    content: const Text('Pedido entregado.'),
+                                    backgroundColor: Colors.blue,
+                                  ),
+                                );
+                              },
+                              style: ElevatedButton.styleFrom(
+                                backgroundColor: Colors.blue,
+                                foregroundColor: Colors.white,
+                                shape: RoundedRectangleBorder(
+                                  borderRadius: BorderRadius.circular(12),
+                                ),
+                                padding: const EdgeInsets.symmetric(
+                                    horizontal: 24, vertical: 12),
+                                textStyle: const TextStyle(
+                                    fontSize: 16, fontWeight: FontWeight.bold),
+                              ),
+                              child: const Text('Entregado'),
+                            ),
+                            ElevatedButton(
+                              onPressed: () {
+                                // Acción para "No entregado"
+                                ScaffoldMessenger.of(context).showSnackBar(
+                                  SnackBar(
+                                    content: const Text('Pedido no entregado.'),
+                                    backgroundColor: Colors.red,
+                                  ),
+                                );
+                              },
+                              style: ElevatedButton.styleFrom(
+                                backgroundColor: Colors.red,
+                                foregroundColor: Colors.white,
+                                shape: RoundedRectangleBorder(
+                                  borderRadius: BorderRadius.circular(12),
+                                ),
+                                padding: const EdgeInsets.symmetric(
+                                    horizontal: 24, vertical: 12),
+                                textStyle: const TextStyle(
+                                    fontSize: 16, fontWeight: FontWeight.bold),
+                              ),
+                              child: const Text('No entregado'),
+                            ),
+                          ],
+                        )
                       ],
-                    )
-                  ],
+                    ),
+                  ),
                 ),
               ),
             ),
@@ -177,97 +219,13 @@ class _GoogleMapPageState extends State<GoogleMapPage> {
         return;
       }
     }
-
-    _locationSubscription = locationController.onLocationChanged.listen((currentLocation) async {
-      if (currentLocation.latitude != null && currentLocation.longitude != null) {
-        if (!mounted) return; // Verifica si el widget aún está montado
-
-        setState(() {
-          currentPosition = LatLng(
-            currentLocation.latitude!,
-            currentLocation.longitude!,
-          );
-        });
-
-        // Animate camera to the new position
-        final GoogleMapController controller = await _controller.future;
-        controller.animateCamera(
-          CameraUpdate.newLatLng(currentPosition!),
-        );
-
-        if (polylines.isEmpty) {
-          initializeMap();
-        } else {
-          _setCameraToFitBounds();
-        }
-      }
-    });
   }
 
-  Future<List<LatLng>> fetchPolylinePoints() async {
-    final polylinePoints = PolylinePoints();
-
-    final result = await polylinePoints.getRouteBetweenCoordinates(
-      googleApiKey: AppConstants.googleMapsApiKey,
-      request: PolylineRequest(
-        origin: PointLatLng(currentPosition!.latitude, currentPosition!.longitude),
-        destination: PointLatLng(widget.destination.latitude, widget.destination.longitude),
-        mode: TravelMode.driving,
-      ),
-    );
-
-    if (result.points.isNotEmpty) {
-      return result.points
-          .map((point) => LatLng(point.latitude, point.longitude))
-          .toList();
+  void _launchURL(String url) async {
+    if (await canLaunch(url)) {
+      await launch(url);
     } else {
-      debugPrint('Error fetching polyline points: ${result.errorMessage}');
-      return [];
+      throw 'Could not launch $url';
     }
-  }
-
-  void generatePolyLineFromPoints(List<LatLng> polylineCoordinates) {
-    const id = PolylineId('polyline');
-
-    final polyline = Polyline(
-      polylineId: id,
-      color: Colors.blueAccent,
-      points: polylineCoordinates,
-      width: 5,
-    );
-
-    setState(() => polylines[id] = polyline);
-  }
-
-  void _setCameraToFitBounds() async {
-    if (currentPosition == null || polylines.isEmpty) return;
-
-    final GoogleMapController controller = await _controller.future;
-    LatLngBounds bounds;
-
-    if (currentPosition!.latitude > widget.destination.latitude &&
-        currentPosition!.longitude > widget.destination.longitude) {
-      bounds = LatLngBounds(
-        southwest: widget.destination,
-        northeast: currentPosition!,
-      );
-    } else if (currentPosition!.longitude > widget.destination.longitude) {
-      bounds = LatLngBounds(
-        southwest: LatLng(currentPosition!.latitude, widget.destination.longitude),
-        northeast: LatLng(widget.destination.latitude, currentPosition!.longitude),
-      );
-    } else if (currentPosition!.latitude > widget.destination.latitude) {
-      bounds = LatLngBounds(
-        southwest: LatLng(widget.destination.latitude, currentPosition!.longitude),
-        northeast: LatLng(currentPosition!.latitude, widget.destination.longitude),
-      );
-    } else {
-      bounds = LatLngBounds(
-        southwest: currentPosition!,
-        northeast: widget.destination,
-      );
-    }
-
-    controller.animateCamera(CameraUpdate.newLatLngBounds(bounds, 50));
   }
 }
