@@ -5,7 +5,6 @@ import 'package:mydealer/models/customersrutas.dart';
 import 'package:mydealer/services/customer_service.dart';
 import 'package:mydealer/widgets/customer/customer_rutas_widget.dart';
 import 'package:mydealer/widgets/customer/customer_widget.dart';
-import 'package:mydealer/widgets/customer/gps_widget.dart';
 
 class CustomersPage extends StatefulWidget {
   @override
@@ -27,7 +26,7 @@ class _CustomersPageState extends State<CustomersPage>
   @override
   void initState() {
     super.initState();
-    _tabController = TabController(length: 4, vsync: this); // Actualizado a 4 tabs
+    _tabController = TabController(length: 3, vsync: this);
     _loadCustomersRutas();
     _loadCustomers();
     _loadAllCustomers();
@@ -126,20 +125,19 @@ class _CustomersPageState extends State<CustomersPage>
             Tab(text: "Rutas"),
             Tab(text: "Todos"),
             Tab(text: "Agenda"),
-            Tab(text: "GPS"), // Nueva pestaña para GPS
           ],
         ),
       ),
       body: _isLoading
           ? const Center(child: CircularProgressIndicator())
           : TabBarView(
-        controller: _tabController,
-        children: [
-          _buildCustomerRutasList(),
-          _buildCustomerList("Todos"),
-          _buildCustomerList("Agenda"),
-        ],
-      ),
+              controller: _tabController,
+              children: [
+                _buildCustomerRutasList(),
+                _buildAllCustomerList(allCustomers),
+                _buildCustomerList("Agenda"),
+              ],
+            ),
     );
   }
 
