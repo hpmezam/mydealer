@@ -9,7 +9,6 @@ import 'package:mydealer/widgets/customer/customer_widget.dart';
 class CustomersPage extends StatefulWidget {
   @override
   _CustomersPageState createState() => _CustomersPageState();
-  
 }
 
 class _CustomersPageState extends State<CustomersPage>
@@ -67,13 +66,14 @@ class _CustomersPageState extends State<CustomersPage>
       });
     }
   }
+
   Future<void> _loadCustomersRutas() async {
     CustomerService customerService = CustomerService();
     try {
-      List<CustomerRutas> loadedCustomersRutas = await customerService.customerRutas();
+      List<CustomerRutas> loadedCustomersRutas =
+          await customerService.customerRutas();
       setState(() {
         customersRutas = loadedCustomersRutas;
-        print(customersRutas);
         _isLoading = false;
       });
     } catch (e) {
@@ -129,11 +129,11 @@ class _CustomersPageState extends State<CustomersPage>
         ),
       ),
       body: _isLoading
-          ? Center(child: CircularProgressIndicator())
+          ? const Center(child: CircularProgressIndicator())
           : TabBarView(
               controller: _tabController,
               children: [
-                _buildCustomeRutasrList("Rutas"),
+                _buildCustomerRutasList(),
                 _buildAllCustomerList(allCustomers),
                 _buildCustomerList("Agenda"),
               ],
@@ -158,14 +158,12 @@ class _CustomersPageState extends State<CustomersPage>
           CustomerWidget(customer: filteredCustomers[index]),
     );
   }
-  Widget _buildCustomeRutasrList(String filter) {
-    //hacer debug;
-    List<CustomerRutas> filteredCustomersRutas = customersRutas;
-    print(filteredCustomersRutas);
+
+  Widget _buildCustomerRutasList() {
     return ListView.builder(
-      itemCount: filteredCustomersRutas.length,
+      itemCount: customersRutas.length,
       itemBuilder: (context, index) =>
-          CustomerRutasWidget(customerRutas: filteredCustomersRutas[index]),
+          CustomerRutasWidget(customerRutas: customersRutas[index]),
     );
   }
 
