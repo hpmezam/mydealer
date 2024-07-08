@@ -87,6 +87,15 @@ class AuthService {
     }
   }
 
+  Future<Map<String, dynamic>?> getUserData() async {
+    final SharedPreferences prefs = await SharedPreferences.getInstance();
+    final String? userDataString = prefs.getString('data_usuario');
+    if (userDataString != null) {
+      return jsonDecode(userDataString) as Map<String, dynamic>;
+    }
+    return null;
+  }
+
   Future<void> _storeToken(String token) async {
     final SharedPreferences prefs = await SharedPreferences.getInstance();
     await prefs.setString('jwt_token', token);
