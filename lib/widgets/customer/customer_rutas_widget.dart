@@ -17,8 +17,9 @@ class CustomerRutasWidget extends StatelessWidget {
       elevation: 5,
       child: ListTile(
         title: Text(
-            '${customerRutas.codCliente} - ${customerRutas.nombreCliente}',
-            style: const TextStyle(fontWeight: FontWeight.bold)),
+          '${customerRutas.codCliente} - ${customerRutas.nombreCliente}',
+          style: const TextStyle(fontWeight: FontWeight.bold),
+        ),
         subtitle: Padding(
           padding: const EdgeInsets.only(top: 8.0),
           child: Column(
@@ -32,10 +33,41 @@ class CustomerRutasWidget extends StatelessWidget {
             ],
           ),
         ),
-        trailing: IconButton(
-          icon: const Icon(Icons.location_on_outlined),
-          onPressed: () async {},
+        leading: Icon(
+          Icons.person_outline,
+          color: Theme.of(context).primaryColor,
         ),
+        trailing: Icon(
+          Icons.location_on_outlined,
+          color: Theme.of(context).primaryColor,
+        ),
+        onTap: () async {
+          LatLng? destination;
+          if (customerRutas.latitud != null && customerRutas.longitud != null) {
+            destination = LatLng(customerRutas.latitud!, customerRutas.longitud!);
+          } else {
+            destination = await _geocodingService.getCoordinatesFromAddress(customerRutas.direccion);
+            if (destination == null) {
+              destination = const LatLng(0.3235301158630212, -78.20971500086232);
+            }
+          }
+
+          if (destination != null) {
+            Navigator.push(
+              context,
+              MaterialPageRoute(
+                builder: (context) => GoogleMapPage(destination: destination!, customer: customerRutas),
+              ),
+            );
+          } else {
+            ScaffoldMessenger.of(context).showSnackBar(
+              const SnackBar(
+                content: Text('No se pudieron obtener las coordenadas para la dirección proporcionada.'),
+                backgroundColor: Colors.redAccent,
+              ),
+            );
+          }
+        },
       ),
     );
   }
