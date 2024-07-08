@@ -15,7 +15,7 @@ class DatabaseHelper {
 
   initDB() async {
     Directory documentsDirectory = await getApplicationDocumentsDirectory();
-    String path = join(documentsDirectory.path, "UserDB.db");
+    String path = join(documentsDirectory.path, "myDealerDB.db");
     return await openDatabase(path, version: 1, onOpen: (db) {},
         onCreate: (Database db, int version) async {
       await db.execute("CREATE TABLE User("
