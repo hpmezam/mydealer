@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:mydealer/models/allCustomers.dart';
 import 'package:mydealer/models/customers.dart';
 import 'package:mydealer/models/customersrutas.dart';
 import 'package:mydealer/services/customer_service.dart';
@@ -18,7 +19,7 @@ class _CustomersPageState extends State<CustomersPage>
   List<Customer> customers = [];
   List<CustomerRutas> customersRutas = [];
   bool _isLoading = true;
-  List<Customer> allCustomers = [];
+  List<AllCustomers> allCustomers = [];
   List<Customer> filteredCustomers = [];
   List<CustomerRutas> filteredCustomersRutas = [];
 
@@ -28,15 +29,34 @@ class _CustomersPageState extends State<CustomersPage>
     _tabController = TabController(length: 3, vsync: this);
     _loadCustomersRutas();
     _loadCustomers();
+    _loadAllCustomers();
+  }
+
+  Future<void> _loadAllCustomers() async {
+    CustomerService customerService = CustomerService();
+    try {
+      List<AllCustomers> loadedAllCustomers =
+          await customerService.fetchAllCustomers();
+      setState(() {
+        print('Datooooos cargados');
+        allCustomers = loadedAllCustomers;
+        _isLoading = false;
+      });
+    } catch (e) {
+      print('Failed to load customers: $e');
+      setState(() {
+        _isLoading = false;
+      });
+    }
   }
 
   Future<void> _loadCustomers() async {
     CustomerService customerService = CustomerService();
     try {
+      print('Entra a_loadCustomers');
       List<Customer> loadedCustomers = await customerService.fetchCustomers();
       setState(() {
         customers = loadedCustomers;
-        allCustomers = loadedCustomers;
         _isLoading = false;
       });
     } catch (e) {
@@ -50,7 +70,8 @@ class _CustomersPageState extends State<CustomersPage>
   Future<void> _loadCustomersRutas() async {
     CustomerService customerService = CustomerService();
     try {
-      List<CustomerRutas> loadedCustomersRutas = await customerService.customerRutas();
+      List<CustomerRutas> loadedCustomersRutas =
+          await customerService.customerRutas();
       setState(() {
         customersRutas = loadedCustomersRutas;
         _isLoading = false;
@@ -69,21 +90,21 @@ class _CustomersPageState extends State<CustomersPage>
       appBar: AppBar(
         title: _isSearching
             ? TextField(
-          controller: _searchController,
-          autofocus: true,
-          decoration: const InputDecoration(
-            hintText: 'Buscar clientes...',
-            border: InputBorder.none,
-          ),
-          onChanged: (value) => _filterCustomers(value),
-        )
+                controller: _searchController,
+                autofocus: true,
+                decoration: const InputDecoration(
+                  hintText: 'Buscar clientes...',
+                  border: InputBorder.none,
+                ),
+                onChanged: (value) => _filterCustomers(value),
+              )
             : const Text(
-          "Clientes",
-          style: TextStyle(
-            color: Colors.black87,
-            fontWeight: FontWeight.bold,
-          ),
-        ),
+                "Clientes",
+                style: TextStyle(
+                  color: Colors.black87,
+                  fontWeight: FontWeight.bold,
+                ),
+              ),
         actions: [
           IconButton(
             icon: Icon(_isSearching ? Icons.close : Icons.search),
@@ -110,13 +131,22 @@ class _CustomersPageState extends State<CustomersPage>
       body: _isLoading
           ? const Center(child: CircularProgressIndicator())
           : TabBarView(
-        controller: _tabController,
-        children: [
-          _buildCustomerRutasList(),
-          _buildCustomerList("Todos"),
-          _buildCustomerList("Agenda"),
-        ],
-      ),
+              controller: _tabController,
+              children: [
+                _buildCustomerRutasList(),
+                _buildAllCustomerList(allCustomers),
+                _buildCustomerList("Agenda"),
+              ],
+            ),
+    );
+  }
+
+  Widget _buildAllCustomerList(List<AllCustomers> allCustomers) {
+    print('ingresoooo a todos los clientes _buildAllCustomerList');
+    return ListView.builder(
+      itemCount: allCustomers.length,
+      itemBuilder: (context, index) =>
+          AllCustomerWidget(allCustomers: allCustomers[index]),
     );
   }
 
@@ -140,19 +170,23 @@ class _CustomersPageState extends State<CustomersPage>
   List<Customer> _filterLogic(List<Customer> customers, String filter) {
     switch (filter) {
       case "Rutas":
-        return customers.where((customer) => customer.limiteCredito > 0).toList();
-      case "Todos":
-        return customers;
+        return customers
+            .where((customer) => customer.limiteCredito > 0)
+            .toList();
       case "Agenda":
-        return customers.where((customer) => customer.saldoPendiente > 0).toList();
+        return customers
+            .where((customer) => customer.saldoPendiente > 0)
+            .toList();
       default:
         return customers;
     }
   }
 
   void _filterCustomers(String query) {
-    List<Customer> results = allCustomers.where((customer) {
-      return customer.nombreCliente.toLowerCase().contains(query.toLowerCase()) ||
+    List<Customer> results = customers.where((customer) {
+      return customer.nombreCliente
+              .toLowerCase()
+              .contains(query.toLowerCase()) ||
           customer.codCliente.toLowerCase().contains(query.toLowerCase());
     }).toList();
     setState(() {
