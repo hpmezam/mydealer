@@ -3,6 +3,7 @@ import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:mydealer/controllers/auth_controller.dart';
 import 'package:mydealer/localization/app_localization.dart';
 import 'package:mydealer/localization/controllers/localization_controller.dart';
+import 'package:mydealer/providers/download_provider.dart';
 import 'package:mydealer/theme/controllers/theme_controller.dart';
 import 'package:mydealer/theme/dark_theme.dart';
 import 'package:mydealer/theme/light_theme.dart';
@@ -25,6 +26,7 @@ void main() async {
       ChangeNotifierProvider(
           create: (_) => ThemeController(sharedPreferences: sharedPreferences)),
       ChangeNotifierProvider(create: (_) => AuthController()),
+      ChangeNotifierProvider(create: (context) => DownloadProvider()),
     ],
     child: MyApp(),
   ));
