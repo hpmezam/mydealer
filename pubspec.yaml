@@ -75,7 +75,7 @@ dev_dependencies:
  
  
 icons_launcher:
-  image_path: "assets/image/ic_launcher.png"
+  image_path: "assets/image/free_delivery.png"
   platforms:
     android:
       enable: true

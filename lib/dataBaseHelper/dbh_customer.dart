@@ -20,35 +20,55 @@ class DatabaseHelperCustomer {
 
   initDB() async {
     Directory documentsDirectory = await getApplicationDocumentsDirectory();
-    String path = join(documentsDirectory.path, "ClientDB.db");
+    String path = join(documentsDirectory.path, "myDealerDB2.db");
     return await openDatabase(path, version: 1,
         onCreate: (Database db, int version) async {
-      await db.execute("CREATE TABLE Clientes("
-          "codrutadet INTEGER PRIMARY KEY,"
-          "codcliente TEXT,"
-          "coddireccionenvio TEXT,"
-          "cedularuc TEXT,"
-          "cliente_nombre TEXT,"
-          "direccion TEXT,"
-          "latitud REAL,"
-          "longitud REAL,"
-          "limitecredito REAL,"
-          "saldopendiente REAL"
-          ")");
+      await db.execute("""CREATE TABLE Clientes(
+          codrutadet INTEGER PRIMARY KEY,
+          codcliente TEXT,
+          coddireccionenvio TEXT,
+          cedularuc TEXT,
+          cliente_nombre TEXT,
+          direccion TEXT,
+          latitud REAL,
+          longitud REAL,
+          limitecredito REAL,
+          saldopendiente REAL,
+          vencido INTEGER
+          );""");
+      await db.execute("""
+      CREATE TABLE AllClientes(
+        codcliente TEXT,
+        codtipocliente TEXT,
+        nombre TEXT,
+        email TEXT,
+        password TEXT,
+        pais TEXT,
+        provincia TEXT,
+        ciudad TEXT,
+        codvendedor TEXT,
+        codformapago TEXT,
+        estado TEXT,
+        limitecredito REAL, 
+        saldopendiente REAL,
+        vencido REAL,
+        cedularuc TEXT, 
+        codlistaprecio TEXT,
+        calificacion TEXT,
+        nombrecomercial TEXT,
+        login TEXT
+      );""");
     });
   }
 
   Future<void> insertCliente(Map<String, dynamic> clienteData) async {
     final db = await database;
-    // Suponiendo que 'codcliente' es la clave por la que quieres buscar.
     var existingClient = await db.query(
       'Clientes',
       where: 'codrutadet = ?',
       whereArgs: [clienteData['codrutadet']],
     );
-
     if (existingClient.isNotEmpty) {
-      // Cliente existe, actualizamos sus datos.
       await db.update(
         'Clientes',
         clienteData,
@@ -56,8 +76,26 @@ class DatabaseHelperCustomer {
         whereArgs: [clienteData['codrutadet']],
       );
     } else {
-      // Cliente no existe, insertamos un nuevo registro.
       await db.insert('Clientes', clienteData);
+    }
+  }
+
+  Future<void> insertAllCliente(Map<String, dynamic> clienteData) async {
+    final db = await database;
+    var existingClient = await db.query(
+      'AllClientes',
+      where: 'codcliente = ?',
+      whereArgs: [clienteData['codcliente']],
+    );
+    if (existingClient.isNotEmpty) {
+      await db.update(
+        'AllClientes',
+        clienteData,
+        where: 'codcliente = ?',
+        whereArgs: [clienteData['codcliente']],
+      );
+    } else {
+      await db.insert('AllClientes', clienteData);
     }
   }
 
@@ -73,7 +111,11 @@ class DatabaseHelperCustomer {
   Future<void> downloadClientes() async {
     final SharedPreferences prefs = await SharedPreferences.getInstance();
     String? codVendedor = prefs.getString('codvendedor');
-    final url = AppConstants.baseUrl + AppConstants.curtomerUri + codVendedor!;
+    String? codRuta = prefs.getString('codruta');
+    final url = AppConstants.baseUrl +
+        AppConstants.curtomerUri +
+        codVendedor! +
+        codRuta!;
     var response = await http.get(Uri.parse(url));
 
     if (response.statusCode == 200) {
@@ -82,6 +124,23 @@ class DatabaseHelperCustomer {
         await insertCliente(cliente);
       }
       print("Clientes descargados y guardados localmente.");
+    } else {
+      throw Exception('Failed to download clients');
+    }
+  }
+
+  Future<void> downloadAllClientes() async {
+    final SharedPreferences prefs = await SharedPreferences.getInstance();
+    String? codVendedor = prefs.getString('codvendedor');
+    final url = AppConstants.baseUrl + AppConstants.curtomerUri + codVendedor!;
+    var response = await http.get(Uri.parse(url));
+
+    if (response.statusCode == 200) {
+      List<dynamic> allClientes = jsonDecode(response.body)['datos'];
+      for (var cliente in allClientes) {
+        await insertAllCliente(cliente);
+      }
+      print("Todos los Clientes descargados y guardados localmente.");
     } else {
       throw Exception('Failed to download clients');
     }
