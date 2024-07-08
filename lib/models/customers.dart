@@ -31,14 +31,18 @@ class Customer {
       cedulaRuc: json['cedularuc']?.replaceAll("'", "") ?? '',
       nombreCliente: json['cliente_nombre']?.replaceAll("'", "") ?? '',
       direccion: json['direccion']?.replaceAll("'", "") ?? '',
-      latitud: json['latitud'] != null ? double.tryParse(json['latitud'].toString()) : null,
-      longitud: json['longitud'] != null ? double.tryParse(json['longitud'].toString()) : null,
+      latitud: json['latitud'] != null
+          ? double.tryParse(json['latitud'].toString())
+          : null,
+      longitud: json['longitud'] != null
+          ? double.tryParse(json['longitud'].toString())
+          : null,
       limiteCredito: double.tryParse(json['limitecredito'].toString()) ?? 0.0,
       saldoPendiente: double.tryParse(json['saldopendiente'].toString()) ?? 0.0,
     );
   }
 
-    Map<String, dynamic> toMap() {
+  Map<String, dynamic> toMap() {
     return {
       'codrutadet': codRutaDet,
       'codcliente': codCliente,
@@ -68,7 +72,7 @@ class Customer {
     );
   }
 
-    Customer copy({
+  Customer copy({
     int? codRutaDet,
     String? codCliente,
     String? codDireccionEnvio,

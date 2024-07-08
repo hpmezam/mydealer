@@ -1,12 +1,10 @@
 import 'package:flutter/material.dart';
+import 'package:mydealer/models/allCustomers.dart';
 import 'package:mydealer/models/customers.dart';
 import 'package:mydealer/services/customer_service.dart';
 import 'package:mydealer/widgets/customer/customer_widget.dart';
 
-
 class CustomersPage extends StatefulWidget {
-
-
   @override
   _CustomersPageState createState() => _CustomersPageState();
 }
@@ -18,7 +16,7 @@ class _CustomersPageState extends State<CustomersPage>
   final TextEditingController _searchController = TextEditingController();
   List<Customer> customers = [];
   bool _isLoading = true;
-  List<Customer> allCustomers = [];
+  List<AllCustomers> allCustomers = [];
   List<Customer> filteredCustomers = [];
 
   @override
@@ -26,11 +24,31 @@ class _CustomersPageState extends State<CustomersPage>
     super.initState();
     _tabController = TabController(length: 3, vsync: this);
     _loadCustomers();
+    _loadAllCustomers();
+  }
+
+  Future<void> _loadAllCustomers() async {
+    CustomerService customerService = CustomerService();
+    try {
+      List<AllCustomers> loadedAllCustomers =
+          await customerService.fetchAllCustomers();
+      setState(() {
+        print('Datooooos cargados');
+        allCustomers = loadedAllCustomers;
+        _isLoading = false;
+      });
+    } catch (e) {
+      print('Failed to load customers: $e');
+      setState(() {
+        _isLoading = false;
+      });
+    }
   }
 
   Future<void> _loadCustomers() async {
     CustomerService customerService = CustomerService();
     try {
+      print('Entra a_loadCustomers');
       List<Customer> loadedCustomers = await customerService.fetchCustomers();
       setState(() {
         customers = loadedCustomers;
@@ -94,10 +112,19 @@ class _CustomersPageState extends State<CustomersPage>
               controller: _tabController,
               children: [
                 _buildCustomerList("Rutas"),
-                _buildCustomerList("Todos"),
+                _buildAllCustomerList(allCustomers),
                 _buildCustomerList("Agenda"),
               ],
             ),
+    );
+  }
+
+  Widget _buildAllCustomerList(List<AllCustomers> allCustomers) {
+    print('ingresoooo a todos los clientes _buildAllCustomerList');
+    return ListView.builder(
+      itemCount: allCustomers.length,
+      itemBuilder: (context, index) =>
+          AllCustomerWidget(allCustomers: allCustomers[index]),
     );
   }
 
@@ -116,8 +143,6 @@ class _CustomersPageState extends State<CustomersPage>
         return customers
             .where((customer) => customer.limiteCredito > 0)
             .toList();
-      case "Todos":
-        return customers;
       case "Agenda":
         return customers
             .where((customer) => customer.saldoPendiente > 0)
