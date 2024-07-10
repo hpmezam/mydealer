@@ -6,6 +6,7 @@ import 'package:mydealer/services/customer_service.dart';
 import 'package:mydealer/widgets/customer/customer_rutas_widget.dart';
 import 'package:mydealer/widgets/customer/customer_widget.dart';
 
+
 class CustomersPage extends StatefulWidget {
   @override
   _CustomersPageState createState() => _CustomersPageState();
@@ -22,6 +23,7 @@ class _CustomersPageState extends State<CustomersPage>
   List<AllCustomers> allCustomers = [];
   List<Customer> filteredCustomers = [];
   List<CustomerRutas> filteredCustomersRutas = [];
+  List<AllCustomers> filteredAllCustomers = [];
 
   @override
   void initState() {
@@ -38,8 +40,8 @@ class _CustomersPageState extends State<CustomersPage>
       List<AllCustomers> loadedAllCustomers =
           await customerService.fetchAllCustomers();
       setState(() {
-        print('Datooooos cargados');
         allCustomers = loadedAllCustomers;
+        filteredAllCustomers = loadedAllCustomers;
         _isLoading = false;
       });
     } catch (e) {
@@ -53,10 +55,10 @@ class _CustomersPageState extends State<CustomersPage>
   Future<void> _loadCustomers() async {
     CustomerService customerService = CustomerService();
     try {
-      print('Entra a_loadCustomers');
       List<Customer> loadedCustomers = await customerService.fetchCustomers();
       setState(() {
         customers = loadedCustomers;
+        filteredCustomers = loadedCustomers;
         _isLoading = false;
       });
     } catch (e) {
@@ -70,10 +72,10 @@ class _CustomersPageState extends State<CustomersPage>
   Future<void> _loadCustomersRutas() async {
     CustomerService customerService = CustomerService();
     try {
-      List<CustomerRutas> loadedCustomersRutas =
-          await customerService.customerRutas();
+      List<CustomerRutas> loadedCustomersRutas = await customerService.customerRutas();
       setState(() {
         customersRutas = loadedCustomersRutas;
+        filteredCustomersRutas = loadedCustomersRutas;
         _isLoading = false;
       });
     } catch (e) {
@@ -129,29 +131,27 @@ class _CustomersPageState extends State<CustomersPage>
         ),
       ),
       body: _isLoading
-          ? const Center(child: CircularProgressIndicator())
+          ? Center(child: CircularProgressIndicator())
           : TabBarView(
               controller: _tabController,
               children: [
                 _buildCustomerRutasList(),
-                _buildAllCustomerList(allCustomers),
-                _buildCustomerList("Agenda"),
+                _buildAllCustomerList(),
+                _buildCustomerList(),
               ],
             ),
     );
   }
 
-  Widget _buildAllCustomerList(List<AllCustomers> allCustomers) {
-    print('ingresoooo a todos los clientes _buildAllCustomerList');
+  Widget _buildAllCustomerList() {
     return ListView.builder(
-      itemCount: allCustomers.length,
+      itemCount: filteredAllCustomers.length,
       itemBuilder: (context, index) =>
-          AllCustomerWidget(allCustomers: allCustomers[index]),
+          AllCustomerWidget(allCustomers: filteredAllCustomers[index]),
     );
   }
 
-  Widget _buildCustomerList(String filter) {
-    List<Customer> filteredCustomers = _filterLogic(customers, filter);
+  Widget _buildCustomerList() {
     return ListView.builder(
       itemCount: filteredCustomers.length,
       itemBuilder: (context, index) =>
@@ -161,36 +161,35 @@ class _CustomersPageState extends State<CustomersPage>
 
   Widget _buildCustomerRutasList() {
     return ListView.builder(
-      itemCount: customersRutas.length,
+      itemCount: filteredCustomersRutas.length,
       itemBuilder: (context, index) =>
-          CustomerRutasWidget(customerRutas: customersRutas[index]),
+          CustomerRutasWidget(customerRutas: filteredCustomersRutas[index]),
     );
   }
 
-  List<Customer> _filterLogic(List<Customer> customers, String filter) {
-    switch (filter) {
-      case "Rutas":
-        return customers
-            .where((customer) => customer.limiteCredito > 0)
-            .toList();
-      case "Agenda":
-        return customers
-            .where((customer) => customer.saldoPendiente > 0)
-            .toList();
-      default:
-        return customers;
-    }
-  }
-
   void _filterCustomers(String query) {
-    List<Customer> results = customers.where((customer) {
-      return customer.nombreCliente
-              .toLowerCase()
-              .contains(query.toLowerCase()) ||
-          customer.codCliente.toLowerCase().contains(query.toLowerCase());
-    }).toList();
-    setState(() {
-      customers = results;
-    });
+    if (query.isEmpty) {
+      setState(() {
+        filteredCustomers = customers;
+        filteredCustomersRutas = customersRutas;
+        filteredAllCustomers = allCustomers;
+      });
+    } else {
+      setState(() {
+        filteredCustomers = customers.where((customer) {
+          return customer.nombreCliente.toLowerCase().contains(query.toLowerCase()) ||
+                 customer.codCliente.toLowerCase().contains(query.toLowerCase());
+        }).toList();
+
+        filteredCustomersRutas = customersRutas.where((customerRutas) {
+          return customerRutas.nombreCliente.toLowerCase().contains(query.toLowerCase()) ||
+                 customerRutas.codCliente.toLowerCase().contains(query.toLowerCase());
+        }).toList();
+        filteredAllCustomers = allCustomers.where((allCustomers) {
+          return allCustomers.nombrecomercial.toLowerCase().contains(query.toLowerCase()) ||
+                 allCustomers.codcliente.toLowerCase().contains(query.toLowerCase());
+        }).toList();
+      });
+    }
   }
 }
