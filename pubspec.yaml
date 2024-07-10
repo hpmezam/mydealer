@@ -49,7 +49,7 @@ dependencies:
   flutter_slidable: ^3.0.1
   readmore: ^2.2.0
   flutter_html_table: ^3.0.0-beta.2
-  google_maps_flutter: ^2.5.0
+  google_maps_flutter: ^2.5.3
   geocoding: ^2.1.1
   geolocator: ^10.1.0
   syncfusion_flutter_datepicker: ^24.1.44
@@ -62,7 +62,7 @@ dependencies:
   emoji_picker_flutter: ^1.6.3
   syncfusion_flutter_charts: ^24.1.43
   location: ^6.0.2
-  flutter_polyline_points: ^2.0.0
+  flutter_polyline_points: ^2.0.9
   sqflite: ^2.0.0+4
 
  
@@ -88,11 +88,8 @@ flutter_icons:
   ios: true
   android: true
   image_path: "assets/image/ic_launcher.png"
- 
- 
- 
- 
- 
+
+
 flutter:
  
  
