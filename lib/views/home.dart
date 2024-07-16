@@ -12,7 +12,7 @@ class HomePage extends StatelessWidget {
     String? codruta = prefs.getString('codruta');
     return {'nombre': nombre, 'login': login, 'codruta': codruta};
   }
-
+  
   @override
   Widget build(BuildContext context) {
     return Scaffold(
