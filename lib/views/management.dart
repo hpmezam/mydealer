@@ -261,23 +261,89 @@ class _ManagementPageState extends State<ManagementPage> {
                 Text('Estado: ${order.ordenEstado}'),
                 Text('Cliente: ${order.clienteNombre}'),
                 Divider(),
-                ...order.detalles.map((detail) {
-                  return ListTile(
-                    title: Text('${detail.nombre}'),
-                    subtitle: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Text('Cantidad: ${detail.cantidad}'),
-                        Text('Precio: \$${detail.precio ?? 0}'),
-                        Text('Subtotal: \$${detail.subtotal ?? 0}'),
-                        Text('Impuesto: \$${detail.impuesto ?? 0}'),
-                        Text('Total: \$${detail.total ?? 0}'),
-                        Text('Unidad de Medida: ${detail.unidadmedida}'),
-                        Text('Categoría: ${detail.categoria}'),
-                      ],
-                    ),
-                  );
-                }).toList(),
+                Table(
+                  columnWidths: {
+                    0: FlexColumnWidth(2),
+                    1: FlexColumnWidth(2),
+                    2: FlexColumnWidth(2),
+                    3: FlexColumnWidth(2),
+                    4: FlexColumnWidth(2),
+                    5: FlexColumnWidth(2),
+                    6: FlexColumnWidth(2),
+                  },
+                  border: TableBorder.all(),
+                  children: [
+                    TableRow(children: [
+                      Padding(
+                        padding: const EdgeInsets.all(8.0),
+                        child: Text('Cant',
+                            style: TextStyle(fontWeight: FontWeight.bold)),
+                      ),
+                      Padding(
+                        padding: const EdgeInsets.all(8.0),
+                        child: Text('Precio',
+                            style: TextStyle(fontWeight: FontWeight.bold)),
+                      ),
+                      Padding(
+                        padding: const EdgeInsets.all(8.0),
+                        child: Text('Subtotal',
+                            style: TextStyle(fontWeight: FontWeight.bold)),
+                      ),
+                      Padding(
+                        padding: const EdgeInsets.all(8.0),
+                        child: Text('Impto',
+                            style: TextStyle(fontWeight: FontWeight.bold)),
+                      ),
+                      Padding(
+                        padding: const EdgeInsets.all(8.0),
+                        child: Text('Total',
+                            style: TextStyle(fontWeight: FontWeight.bold)),
+                      ),
+                      Padding(
+                        padding: const EdgeInsets.all(8.0),
+                        child: Text('Uni. Medida',
+                            style: TextStyle(fontWeight: FontWeight.bold)),
+                      ),
+                      Padding(
+                        padding: const EdgeInsets.all(8.0),
+                        child: Text('Catgría',
+                            style: TextStyle(fontWeight: FontWeight.bold)),
+                      ),
+                    ]),
+                    ...order.detalles.map((detail) {
+                      return TableRow(children: [
+                        Padding(
+                          padding: const EdgeInsets.all(8.0),
+                          child: Text('${detail.cantidad}'),
+                        ),
+                        Padding(
+                          padding: const EdgeInsets.all(8.0),
+                          child: Text('\$${detail.precio ?? 0}'),
+                        ),
+                        Padding(
+                          padding: const EdgeInsets.all(8.0),
+                          child: Text('\$${detail.subtotal ?? 0}'),
+                        ),
+                        Padding(
+                          padding: const EdgeInsets.all(8.0),
+                          child: Text('\$${detail.impuesto ?? 0}'),
+                        ),
+                        Padding(
+                          padding: const EdgeInsets.all(8.0),
+                          child: Text('\$${detail.total ?? 0}'),
+                        ),
+                        Padding(
+                          padding: const EdgeInsets.all(8.0),
+                          child: Text('${detail.unidadmedida}'),
+                        ),
+                        Padding(
+                          padding: const EdgeInsets.all(8.0),
+                          child: Text('${detail.categoria}'),
+                        ),
+                      ]);
+                    }).toList(),
+                  ],
+                ),
               ],
             ),
           ),

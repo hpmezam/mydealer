@@ -153,35 +153,80 @@ class _OrdersPageState extends State<OrdersPage>
         return AlertDialog(
           title: Text("Detalles del Pedido"),
           content: SingleChildScrollView(
-            child: ListBody(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text("Cliente: ${order['client']}"),
                 Text("Fecha: ${order['date']}"),
                 Text("Total: ${order['total']}"),
+                Text("Descuento: ${order['descuento']}"),
+                Text("Subtotal: ${order['subtotal']}"),
+                Text("Impuesto: ${order['impuesto']}"),
                 Divider(),
                 Text("Detalles:"),
-                ...((order['details'] as List).map((detail) {
-                  return ListTile(
-                    title: Text(detail['nombre']),
-                    subtitle: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Text("Número de Línea: ${detail['numlinea']}"),
-                        Text("Código de Producto: ${detail['codproducto']}"),
-                        Text("Cantidad: ${detail['cantidad']}"),
-                        Text("Precio: \$${detail['precio']}"),
-                        Text("Descuento: \$${detail['descuento']}"),
-                        Text("Subtotal: \$${detail['subtotal']}"),
-                        Text("Impuesto: \$${detail['impuesto']}"),
-                        Text("Total: \$${detail['total']}"),
-                        Text(
-                            "Porcentaje de Impuesto: ${detail['porcimpuesto']}%"),
-                        Text("Estado: ${detail['estado']}"),
-                        Text("Categoría: ${detail['categoria']}"),
-                      ],
-                    ),
-                  );
-                }).toList())
+                Table(
+                  columnWidths: {
+                    0: IntrinsicColumnWidth(),
+                    1: IntrinsicColumnWidth(),
+                    2: IntrinsicColumnWidth(),
+                    3: IntrinsicColumnWidth(),
+                    4: IntrinsicColumnWidth(),
+                  },
+                  border: TableBorder.all(),
+                  children: [
+                    TableRow(children: [
+                      Padding(
+                        padding: const EdgeInsets.all(8.0),
+                        child: Text('Cant',
+                            style: TextStyle(fontWeight: FontWeight.bold)),
+                      ),
+                      Padding(
+                        padding: const EdgeInsets.all(8.0),
+                        child: Text('Precio',
+                            style: TextStyle(fontWeight: FontWeight.bold)),
+                      ),
+                      Padding(
+                        padding: const EdgeInsets.all(8.0),
+                        child: Text('Dcto',
+                            style: TextStyle(fontWeight: FontWeight.bold)),
+                      ),
+                      Padding(
+                        padding: const EdgeInsets.all(8.0),
+                        child: Text('Impto',
+                            style: TextStyle(fontWeight: FontWeight.bold)),
+                      ),
+                      Padding(
+                        padding: const EdgeInsets.all(8.0),
+                        child: Text('Subtotal',
+                            style: TextStyle(fontWeight: FontWeight.bold)),
+                      ),
+                    ]),
+                    ...((order['details'] as List).map((detail) {
+                      return TableRow(children: [
+                        Padding(
+                          padding: const EdgeInsets.all(8.0),
+                          child: Text(detail['cantidad'].toString()),
+                        ),
+                        Padding(
+                          padding: const EdgeInsets.all(8.0),
+                          child: Text("\$${detail['precio']}"),
+                        ),
+                        Padding(
+                          padding: const EdgeInsets.all(8.0),
+                          child: Text("\$${detail['descuento']}"),
+                        ),
+                        Padding(
+                          padding: const EdgeInsets.all(8.0),
+                          child: Text("\$${detail['impuesto']}"),
+                        ),
+                        Padding(
+                          padding: const EdgeInsets.all(8.0),
+                          child: Text("\$${detail['subtotal']}"),
+                        ),
+                      ]);
+                    }).toList()),
+                  ],
+                ),
               ],
             ),
           ),
