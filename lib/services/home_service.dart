@@ -74,7 +74,8 @@ class HomeService {
       return [];
     }
   }
-  Future<List<HomePayments>> fetchPayment() async {
+
+  Future<HomePayments> fetchPayment() async {
     final SharedPreferences prefs = await SharedPreferences.getInstance();
     String? codvendedor = prefs.getString('codvendedor');
     String baseUrl =
@@ -83,11 +84,12 @@ class HomeService {
     try {
       final response = await http.get(Uri.parse(baseUrl));
       final data = json.decode(response.body) as Map<String, dynamic>;
-      final List<dynamic> customersJson = data['datos'] ?? [];
-      return customersJson.map((json) => HomePayments.fromJson(json)).toList();
+      final Map<String, dynamic> datos = data['datos'] ?? {};
+      return HomePayments.fromJson(datos);
     } catch (e) {
       print('Error fetching customers: $e');
-      return [];
+      return HomePayments(
+          realizados: 0, pendientes: 0); // Valor por defecto en caso de error
     }
   }
 }
