@@ -13,12 +13,8 @@ class AppConstants {
   static const String numberOrders = "/api/vendedor/numeroPedidos";
   static const String numberPayment = "/api/vendedor/numeroCobros";
   static const String allOrdersByVendedor = "/api/pedidosTodos/";
-
-
-
-
   static const String configUri = '/api/v1/config';
-  static const String sellerUri = '/api/v3/seller/seller-info';       
+  static const String sellerUri = '/api/v3/seller/seller-info';
   static const String sellerAndBankUpdate = '/api/v3/seller/seller-update';
   static const String shopUri = '/api/v3/seller/shop-info';
   static const String shopUpdate = '/api/v3/seller/shop-update';
@@ -218,6 +214,7 @@ class AppConstants {
   static const String userEmail = 'user_email';
   static const String langKey = 'lang';
   static const String showCookies = 'cookies';
+  static const String titleSettings = 'Configuración';
 
   static List<LanguageModel> languages = [
     LanguageModel(
@@ -225,21 +222,21 @@ class AppConstants {
         languageName: 'English',
         countryCode: 'US',
         languageCode: 'en'),
-    LanguageModel(
-        imageUrl: Images.arabic,
-        languageName: 'Arabic',
-        countryCode: 'SA',
-        languageCode: 'ar'),
-    LanguageModel(
-        imageUrl: Images.hindi,
-        languageName: 'Hindi',
-        countryCode: 'IN',
-        languageCode: 'hi'),
-    LanguageModel(
-        imageUrl: Images.bd,
-        languageName: 'Bangla',
-        countryCode: 'BD',
-        languageCode: 'bn'),
+    // LanguageModel(
+    //     imageUrl: Images.arabic,
+    //     languageName: 'Arabic',
+    //     countryCode: 'SA',
+    //     languageCode: 'ar'),
+    // LanguageModel(
+    //     imageUrl: Images.hindi,
+    //     languageName: 'Hindi',
+    //     countryCode: 'IN',
+    //     languageCode: 'hi'),
+    // LanguageModel(
+    //     imageUrl: Images.bd,
+    //     languageName: 'Bangla',
+    //     countryCode: 'BD',
+    //     languageCode: 'bn'),
     LanguageModel(
         imageUrl: Images.spanish,
         languageName: 'Spanish',

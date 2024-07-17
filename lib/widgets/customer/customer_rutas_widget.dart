@@ -26,8 +26,7 @@ class CustomerRutasWidget extends StatelessWidget {
             crossAxisAlignment: CrossAxisAlignment.start,
             children: <Widget>[
               Text(customerRutas.direccion),
-              Text('Latitud: ${customerRutas.latitud}'),
-              Text('Longitud: ${customerRutas.longitud}'),
+
               Text('Límite Crédito: ${customerRutas.limiteCredito}'),
               Text('Saldo Disponible: ${customerRutas.saldoPendiente}'),
             ],

@@ -100,4 +100,16 @@ class AuthService {
     final SharedPreferences prefs = await SharedPreferences.getInstance();
     await prefs.setString('jwt_token', token);
   }
+
+  Future<void> clearToken() async {
+    final SharedPreferences prefs = await SharedPreferences.getInstance();
+    await prefs.remove('username');
+    await prefs.remove('password');
+    await prefs.remove('apiResponse');
+    await prefs.remove('nombre');
+    await prefs.remove('login');
+    await prefs.remove('codruta');
+    await prefs.remove('codvendedor');
+    await prefs.remove('jwt_token');
+  }
 }
