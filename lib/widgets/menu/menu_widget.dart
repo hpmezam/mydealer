@@ -43,15 +43,9 @@ void showCustomMenu(BuildContext context) {
                 mainAxisSpacing: 16,
                 children: <Widget>[
                   _buildMenuItem(
-                      context, Icons.account_circle, "Profile", Colors.blue),
+                      context, Icons.account_circle, "Perfil", Colors.blue),
                   _buildMenuItem(
-                      context, Icons.language, "Language", Colors.blue),
-                  _buildMenuItem(
-                      context, Icons.download, "Downloads", Colors.blue),
-                  _buildMenuItem(
-                      context, Icons.exit_to_app, "Logout", Colors.red),
-                  _buildMenuItem(
-                      context, Icons.info_outline, "Version", Colors.purple),
+                      context, Icons.download, "Descargas", Colors.blue),
                 ],
               ),
             ),
@@ -68,26 +62,17 @@ Widget _buildMenuItem(
     onTap: () {
       Navigator.pop(context); // Close the menu before navigating
       switch (label) {
-        case "Profile":
+        case "Perfil":
           Navigator.push(
             context,
             MaterialPageRoute(builder: (context) => ProfileScreen()),
           );
           break;
-        case "Language":
-          // Implementa lo que debe suceder para "Language"
-          break;
-        case "Downloads":
+        case "Descargas":
           Navigator.push(
             context,
             MaterialPageRoute(builder: (context) => DownloadPage()),
           );
-          break;
-        case "Logout":
-          // Implementa lo que debe suceder para "Logout"
-          break;
-        case "Version":
-          // Implementa lo que debe suceder para "Version"
           break;
       }
     },

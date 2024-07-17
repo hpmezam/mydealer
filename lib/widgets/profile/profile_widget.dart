@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:mydealer/controllers/custom_app_bar_widget.dart';
 import 'package:mydealer/localization/language_constrants.dart';
 import 'package:mydealer/services/auth_service.dart';
 import 'package:mydealer/utils/app_constants.dart';
@@ -10,7 +11,8 @@ import 'package:mydealer/widgets/profile/theme_changer_widget.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 class ProfileScreen extends StatelessWidget {
-
+    const ProfileScreen({Key? key}) : super(key: key);
+    
   Future<Map<String, String?>> loadUserData() async {
     AuthService authService = AuthService();
     Map<String, dynamic>? dataVendedor = await authService.getUserData();
@@ -57,21 +59,8 @@ class ProfileScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        title: Text(
-          'My Profile',
-          style: TextStyle(
-            color: Colors.black87,
-            fontWeight: FontWeight.bold,
-          ),
-        ),
-        centerTitle: true,
-        backgroundColor: Colors.white24,
-        leading: IconButton(
-          icon: Icon(Icons.arrow_back),
-          onPressed: () => Navigator.of(context).pop(),
-        ),
-      ),
+      appBar: CustomAppBarWidget(
+          isBackButtonExist: true, title: getTranslated('my_profile', context)),
       body: ListView(
         children: <Widget>[
           Padding(
@@ -80,90 +69,131 @@ class ProfileScreen extends StatelessWidget {
               child: Column(
                 children: <Widget>[
                   Padding(
-                    padding: const EdgeInsets.symmetric(horizontal: Dimensions.paddingSizeSmall),
+                    padding: const EdgeInsets.symmetric(
+                        horizontal: Dimensions.paddingSizeSmall),
                     child: Stack(
                       children: [
                         FutureBuilder<Map<String, String?>>(
                           future: loadUserData(),
                           builder: (context, snapshot) {
-                            if (snapshot.connectionState == ConnectionState.done) {
+                            if (snapshot.connectionState ==
+                                ConnectionState.done) {
                               if (snapshot.hasData) {
                                 return GestureDetector(
-                                  onTap: () => _showUserDetails(context, snapshot.data!),
+                                  onTap: () =>
+                                      _showUserDetails(context, snapshot.data!),
                                   child: Padding(
                                     padding: const EdgeInsets.only(
                                         top: Dimensions.paddingSizeMedium,
                                         left: Dimensions.paddingSizeExtraSmall,
-                                        right: Dimensions.paddingSizeExtraSmall),
+                                        right:
+                                            Dimensions.paddingSizeExtraSmall),
                                     child: Container(
                                       height: 120,
-                                      width: MediaQuery.of(context).size.width * 0.9, // Make the blue box wider
+                                      width: MediaQuery.of(context).size.width *
+                                          0.9, // Make the blue box wider
                                       decoration: BoxDecoration(
-                                        color: ColorResources.getPrimary(context),
-                                        borderRadius: BorderRadius.circular(Dimensions.paddingSizeSmall),
+                                        color:
+                                            ColorResources.getPrimary(context),
+                                        borderRadius: BorderRadius.circular(
+                                            Dimensions.paddingSizeSmall),
                                       ),
                                       child: Padding(
-                                        padding: const EdgeInsets.only(bottom: Dimensions.paddingSizeSmall),
+                                        padding: const EdgeInsets.only(
+                                            bottom:
+                                                Dimensions.paddingSizeSmall),
                                         child: Row(
                                           children: [
                                             Padding(
-                                              padding: const EdgeInsets.fromLTRB(
-                                                  Dimensions.paddingSizeSmall,
-                                                  0,
-                                                  Dimensions.paddingSizeSmall,
-                                                  0),
+                                              padding:
+                                                  const EdgeInsets.fromLTRB(
+                                                      Dimensions
+                                                          .paddingSizeSmall,
+                                                      0,
+                                                      Dimensions
+                                                          .paddingSizeSmall,
+                                                      0),
                                               child: Container(
                                                 width: 60,
                                                 height: 60,
                                                 decoration: BoxDecoration(
-                                                  color: Theme.of(context).highlightColor,
+                                                  color: Theme.of(context)
+                                                      .highlightColor,
                                                   border: Border.all(
-                                                      color: Colors.white, width: 3),
+                                                      color: Colors.white,
+                                                      width: 3),
                                                   shape: BoxShape.circle,
                                                 ),
                                                 child: ClipRRect(
-                                                  borderRadius: const BorderRadius.all(Radius.circular(50)),
+                                                  borderRadius:
+                                                      const BorderRadius.all(
+                                                          Radius.circular(50)),
                                                   child: CustomImageWidget(
                                                     width: 60,
                                                     height: 60,
-                                                    image: AppConstants.addDeliveryMan,
+                                                    image: AppConstants
+                                                        .addDeliveryMan,
                                                     fit: BoxFit.cover,
                                                   ),
                                                 ),
                                               ),
                                             ),
                                             Padding(
-                                              padding: const EdgeInsets.fromLTRB(
+                                              padding: const EdgeInsets
+                                                  .fromLTRB(
                                                   Dimensions.paddingSizeSmall,
                                                   0,
                                                   Dimensions.paddingSizeSmall,
                                                   Dimensions.paddingSizeSmall),
                                               child: Column(
-                                                mainAxisAlignment: MainAxisAlignment.center,
-                                                crossAxisAlignment: CrossAxisAlignment.start,
+                                                mainAxisAlignment:
+                                                    MainAxisAlignment.center,
+                                                crossAxisAlignment:
+                                                    CrossAxisAlignment.start,
                                                 children: [
                                                   Text(
-                                                    snapshot.data!['nombre'] ?? 'No disponible',
+                                                    snapshot.data!['nombre'] ??
+                                                        'No disponible',
                                                     maxLines: 2,
                                                     textAlign: TextAlign.center,
                                                     style: robotoBold.copyWith(
-                                                        color: ColorResources.getProfileTextColor(context),
-                                                        fontSize: Dimensions.fontSizeExtraLarge),
+                                                        color: ColorResources
+                                                            .getProfileTextColor(
+                                                                context),
+                                                        fontSize: Dimensions
+                                                            .fontSizeExtraLarge),
                                                   ),
                                                   const SizedBox(
-                                                      height: Dimensions.paddingSizeExtraSmall),
-                                                  Text('Usuario: ' + (snapshot.data!['login'] ?? 'No disponible'),
+                                                      height: Dimensions
+                                                          .paddingSizeExtraSmall),
+                                                  Text(
+                                                      'Usuario: ' +
+                                                          (snapshot.data![
+                                                                  'login'] ??
+                                                              'No disponible'),
                                                       maxLines: 2,
-                                                      textAlign: TextAlign.center,
+                                                      textAlign:
+                                                          TextAlign.center,
                                                       style: titilliumRegular.copyWith(
-                                                          color: ColorResources.getProfileTextColor(context),
-                                                          fontSize: Dimensions.fontSizeSmall)),
-                                                  Text('Ruta: ' + (snapshot.data!['codruta'] ?? 'No disponible'),
+                                                          color: ColorResources
+                                                              .getProfileTextColor(
+                                                                  context),
+                                                          fontSize: Dimensions
+                                                              .fontSizeSmall)),
+                                                  Text(
+                                                      'Ruta: ' +
+                                                          (snapshot.data![
+                                                                  'codruta'] ??
+                                                              'No disponible'),
                                                       maxLines: 2,
-                                                      textAlign: TextAlign.center,
+                                                      textAlign:
+                                                          TextAlign.center,
                                                       style: titilliumRegular.copyWith(
-                                                          color: ColorResources.getProfileTextColor(context),
-                                                          fontSize: Dimensions.fontSizeSmall)),
+                                                          color: ColorResources
+                                                              .getProfileTextColor(
+                                                                  context),
+                                                          fontSize: Dimensions
+                                                              .fontSizeSmall)),
                                                 ],
                                               ),
                                             ),
@@ -189,7 +219,8 @@ class ProfileScreen extends StatelessWidget {
             ),
           ),
           const Padding(
-            padding: EdgeInsets.symmetric(horizontal: Dimensions.paddingSizeMedium),
+            padding:
+                EdgeInsets.symmetric(horizontal: Dimensions.paddingSizeMedium),
             child: ThemeChangerWidget(),
           ),
           Padding(

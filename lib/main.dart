@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:mydealer/controllers/auth_controller.dart';
+import 'package:mydealer/controllers/profile_controller.dart';
+import 'package:mydealer/controllers/splash_controller.dart';
 import 'package:mydealer/localization/app_localization.dart';
 import 'package:mydealer/localization/controllers/localization_controller.dart';
 import 'package:mydealer/providers/download_provider.dart';
@@ -8,7 +10,6 @@ import 'package:mydealer/theme/controllers/theme_controller.dart';
 import 'package:mydealer/theme/dark_theme.dart';
 import 'package:mydealer/theme/light_theme.dart';
 import 'package:mydealer/utils/app_constants.dart';
-// import 'package:path/path.dart';
 import 'package:provider/provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'services/check_gps_permissions.dart';
@@ -18,6 +19,7 @@ final GlobalKey<NavigatorState> navigatorKey = GlobalKey<NavigatorState>();
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   SharedPreferences sharedPreferences = await SharedPreferences.getInstance();
+
   runApp(MultiProvider(
     providers: [
       ChangeNotifierProvider(
@@ -25,8 +27,12 @@ void main() async {
               LocalizationController(sharedPreferences: sharedPreferences)),
       ChangeNotifierProvider(
           create: (_) => ThemeController(sharedPreferences: sharedPreferences)),
-      ChangeNotifierProvider(create: (_) => AuthController()),
+      ChangeNotifierProvider(
+        create: (context) => AuthController(),
+      ),
       ChangeNotifierProvider(create: (context) => DownloadProvider()),
+      ChangeNotifierProvider(create: (context) => SplashController()),
+      ChangeNotifierProvider(create: (_) => ProfileController()),
     ],
     child: MyApp(),
   ));
@@ -57,4 +63,9 @@ class MyApp extends StatelessWidget {
       home: const CheckGpsPermissions(), // Pantalla de verificación
     );
   }
+}
+
+class Get {
+  static BuildContext? get context => navigatorKey.currentContext;
+  static NavigatorState? get navigator => navigatorKey.currentState;
 }

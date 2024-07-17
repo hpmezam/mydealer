@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:mydealer/localization/language_constrants.dart';
 import 'package:mydealer/models/allCustomers.dart';
 import 'package:mydealer/models/customers.dart';
 import 'package:mydealer/models/customersrutas.dart';
@@ -6,6 +7,7 @@ import 'package:mydealer/services/customer_service.dart';
 import 'package:mydealer/widgets/customer/customer_rutas_widget.dart';
 import 'package:mydealer/widgets/customer/customer_widget.dart';
 import 'package:mydealer/widgets/customer/gps_widget.dart';
+import 'package:mydealer/utils/styles.dart';
 
 class CustomersPage extends StatefulWidget {
   @override
@@ -28,7 +30,8 @@ class _CustomersPageState extends State<CustomersPage>
   @override
   void initState() {
     super.initState();
-    _tabController = TabController(length: 4, vsync: this); // Actualizado a 4 pestañas
+    _tabController =
+        TabController(length: 4, vsync: this); // Actualizado a 4 pestañas
     _loadCustomersRutas();
     _loadCustomers();
     _loadAllCustomers();
@@ -138,19 +141,23 @@ class _CustomersPageState extends State<CustomersPage>
               controller: _tabController,
               children: [
                 _buildCustomerRutasList(),
-               // _buildAllCustomerList()
                 _buildCustomerList(),
+                _buildAgendaList(),
                 GPSWidget(rutas: customersRutas), // Nueva vista para GPS
               ],
             ),
     );
   }
 
-  
-
   Widget _buildCustomerList() {
     return filteredCustomers.isEmpty
-        ? Center(child: Text('No hay clientes disponibles'))
+        ? Center(
+            child: Text(
+            getTranslated('messageRecords', context)!,
+            style: robotoRegular.copyWith(
+              color: Colors.blue,
+            ),
+          ))
         : ListView.builder(
             itemCount: filteredCustomers.length,
             itemBuilder: (context, index) =>
@@ -158,9 +165,26 @@ class _CustomersPageState extends State<CustomersPage>
           );
   }
 
+  Widget _buildAgendaList() {
+    return Center(
+      child: Text(
+        getTranslated('diaryNotAvailable', context)!,
+        style: robotoRegular.copyWith(
+          color: Colors.blue,
+        ),
+      ),
+    );
+  }
+
   Widget _buildCustomerRutasList() {
     return filteredCustomersRutas.isEmpty
-        ? Center(child: Text('No hay clientes disponibles'))
+        ? Center(
+            child: Text(
+            getTranslated('messageRecords', context)!,
+            style: robotoRegular.copyWith(
+              color: Colors.blue,
+            ),
+          ))
         : ListView.builder(
             itemCount: filteredCustomersRutas.length,
             itemBuilder: (context, index) => CustomerRutasWidget(
@@ -178,9 +202,7 @@ class _CustomersPageState extends State<CustomersPage>
     } else {
       setState(() {
         filteredCustomers = customers.where((customer) {
-          return customer.nombreCliente
-                  .toLowerCase()
-                  .contains(query.toLowerCase()) ||
+          return customer.nombre.toLowerCase().contains(query.toLowerCase()) ||
               customer.codCliente.toLowerCase().contains(query.toLowerCase());
         }).toList();
 
@@ -188,13 +210,17 @@ class _CustomersPageState extends State<CustomersPage>
           return customerRutas.nombreCliente
                   .toLowerCase()
                   .contains(query.toLowerCase()) ||
-              customerRutas.codCliente.toLowerCase().contains(query.toLowerCase());
+              customerRutas.codCliente
+                  .toLowerCase()
+                  .contains(query.toLowerCase());
         }).toList();
         filteredAllCustomers = allCustomers.where((allCustomers) {
           return allCustomers.nombrecomercial
                   .toLowerCase()
                   .contains(query.toLowerCase()) ||
-              allCustomers.codcliente.toLowerCase().contains(query.toLowerCase());
+              allCustomers.codcliente
+                  .toLowerCase()
+                  .contains(query.toLowerCase());
         }).toList();
       });
     }
