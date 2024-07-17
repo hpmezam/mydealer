@@ -3,6 +3,7 @@ import 'package:mydealer/services/navigation_provider.dart';
 import 'package:mydealer/utils/dimensions.dart';
 import 'package:provider/provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:mydealer/widgets/dashboard/dash_changer_widget.dart';
 
 class HomePage extends StatelessWidget {
   Future<Map<String, String?>> loadUserData() async {
@@ -12,7 +13,7 @@ class HomePage extends StatelessWidget {
     String? codruta = prefs.getString('codruta');
     return {'nombre': nombre, 'login': login, 'codruta': codruta};
   }
-  
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -68,10 +69,11 @@ class HomePage extends StatelessWidget {
                 [Colors.redAccent, Colors.red]),
           ],
         ),
-        _buildStatCardFlat('Gestiones', '2', Colors.teal),
-        _buildStatCardFlat('Gestiones Pendientes', '0', Colors.grey),
-        _buildStatCardFlat('Toma de GPS', '1', Colors.orange),
-        _buildStatCardFlat('Ubicacion GPS', '0', Colors.red),
+        Padding(
+          padding:
+              EdgeInsets.symmetric(horizontal: Dimensions.paddingSizeMedium),
+          child: DashChangerWidget(),
+        ),
       ]),
     ));
   }

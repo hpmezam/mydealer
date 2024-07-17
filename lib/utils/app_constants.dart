@@ -222,21 +222,21 @@ class AppConstants {
         languageName: 'English',
         countryCode: 'US',
         languageCode: 'en'),
-    LanguageModel(
-        imageUrl: Images.arabic,
-        languageName: 'Arabic',
-        countryCode: 'SA',
-        languageCode: 'ar'),
-    LanguageModel(
-        imageUrl: Images.hindi,
-        languageName: 'Hindi',
-        countryCode: 'IN',
-        languageCode: 'hi'),
-    LanguageModel(
-        imageUrl: Images.bd,
-        languageName: 'Bangla',
-        countryCode: 'BD',
-        languageCode: 'bn'),
+    // LanguageModel(
+    //     imageUrl: Images.arabic,
+    //     languageName: 'Arabic',
+    //     countryCode: 'SA',
+    //     languageCode: 'ar'),
+    // LanguageModel(
+    //     imageUrl: Images.hindi,
+    //     languageName: 'Hindi',
+    //     countryCode: 'IN',
+    //     languageCode: 'hi'),
+    // LanguageModel(
+    //     imageUrl: Images.bd,
+    //     languageName: 'Bangla',
+    //     countryCode: 'BD',
+    //     languageCode: 'bn'),
     LanguageModel(
         imageUrl: Images.spanish,
         languageName: 'Spanish',

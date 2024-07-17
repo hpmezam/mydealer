@@ -1,7 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
+import 'package:mydealer/localization/language_constrants.dart';
+import 'package:mydealer/utils/dimensions.dart';
 import 'dart:convert';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:mydealer/utils/styles.dart';
 
 class ManagementPage extends StatefulWidget {
   @override
@@ -204,16 +207,40 @@ class _ManagementPageState extends State<ManagementPage> {
     );
   }
 
+  // Widget _buildShowButton() {
+  //   return ElevatedButton(
+  //     onPressed: _fetchOrders,
+  //     child: Text('Mostrar'),
+  //   );
+  // }
+
   Widget _buildShowButton() {
     return ElevatedButton(
-      onPressed: _fetchOrders,
-      child: Text('Mostrar'),
-    );
+        onPressed: _fetchOrders,
+        style: ElevatedButton.styleFrom(
+          backgroundColor: Theme.of(context).primaryColor,
+          foregroundColor: Colors.white,
+          padding: EdgeInsets.symmetric(
+            horizontal: Dimensions.paddingSizeExtraLarge,
+            vertical: Dimensions.paddingSizeSmall,
+          ),
+          textStyle: TextStyle(
+            fontSize: Dimensions.fontSizeLarge,
+            fontWeight: FontWeight.bold,
+          ),
+        ),
+        child: Text(getTranslated('show', context)!));
   }
 
   Widget _buildOrderList() {
     if (_orders.isEmpty) {
-      return Center(child: Text('No se encontraron pedidos.'));
+      return Center(
+          child: Text(
+        getTranslated('messageOrders', context)!,
+        style: robotoRegular.copyWith(
+          color: Colors.blue,
+        ),
+      ));
     }
 
     return ListView.builder(
