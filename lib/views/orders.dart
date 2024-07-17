@@ -159,10 +159,7 @@ class _OrdersPageState extends State<OrdersPage>
                 Text("Cliente: ${order['client']}"),
                 Text("Fecha: ${order['date']}"),
                 Text("Total: ${order['total']}"),
-                Text("Descuento: ${order['descuento']}"),
-                Text("Subtotal: ${order['subtotal']}"),
-                Text("Impuesto: ${order['impuesto']}"),
-                Divider(),
+                //Divider(),
                 Text("Detalles:"),
                 Table(
                   columnWidths: {
