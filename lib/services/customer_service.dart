@@ -57,7 +57,7 @@ class CustomerService {
       String? codVendedor = prefs.getString('codvendedor');
       String? codruta = prefs.getString('codruta');
       final response = await http.get(Uri.parse('$baseUrl${codVendedor!}/${codruta!}'));
-      print('$baseUrl${codVendedor!}/${codruta!}');
+      // print('$baseUrl${codVendedor!}/${codruta!}');
       final data = json.decode(response.body) as Map<String, dynamic>;
       final List<dynamic> customersRutasJson = data['datos'] ?? [];
       List<CustomerRutas> customersRutas =
