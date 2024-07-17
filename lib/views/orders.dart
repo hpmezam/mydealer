@@ -1,7 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
+import 'package:mydealer/widgets/orders/orders_app_bar_widget.dart';
 import 'dart:convert';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:mydealer/utils/styles.dart';
+import 'package:mydealer/localization/language_constrants.dart';
 
 void main() {
   runApp(MaterialApp(
@@ -16,7 +19,7 @@ class OrdersPage extends StatefulWidget {
 
 class _OrdersPageState extends State<OrdersPage>
     with SingleTickerProviderStateMixin {
-  TabController? _tabController;
+  late TabController _tabController;
   List<Map<String, dynamic>> _orders = [];
   bool _loading = false;
 
@@ -24,28 +27,30 @@ class _OrdersPageState extends State<OrdersPage>
   void initState() {
     super.initState();
     _tabController = TabController(length: 4, vsync: this);
-    _tabController?.addListener(_handleTabSelection);
+    _tabController.addListener(_handleTabSelection);
     _loadVendedorID();
   }
 
   void _handleTabSelection() {
-    if (_tabController!.index == 1) {
-      Future<void> _loadVendedorID_estado() async {
-        final SharedPreferences prefs = await SharedPreferences.getInstance();
-        String? vendedorID = prefs.getString('codvendedor');
-        if (vendedorID != null) {
-          _fetchPendingOrders(vendedorID, 'N');
-        } else {
-          print('No se encontró el codvendedor en SharedPreferences');
-        }
-      }
+    if (_tabController.index == 1) {
+      _loadVendedorID_estado();
+    }
+  }
+
+  Future<void> _loadVendedorID_estado() async {
+    final SharedPreferences prefs = await SharedPreferences.getInstance();
+    String? vendedorID = prefs.getString('codvendedor');
+    if (vendedorID != null) {
+      _fetchPendingOrders(vendedorID, 'N');
+    } else {
+      print('No se encontró el codvendedor en SharedPreferences');
     }
   }
 
   @override
   void dispose() {
-    _tabController?.removeListener(_handleTabSelection);
-    _tabController?.dispose();
+    _tabController.removeListener(_handleTabSelection);
+    _tabController.dispose();
     super.dispose();
   }
 
@@ -162,7 +167,7 @@ class _OrdersPageState extends State<OrdersPage>
                 Text("Descuento: ${order['descuento']}"),
                 Text("Subtotal: ${order['subtotal']}"),
                 Text("Impuesto: ${order['impuesto']}"),
-                Divider(),
+                // Divider(),
                 Text("Detalles:"),
                 Table(
                   columnWidths: {
@@ -246,18 +251,9 @@ class _OrdersPageState extends State<OrdersPage>
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        title: Text("Pedidos"),
-        bottom: TabBar(
-          controller: _tabController,
-          tabs: [
-            Tab(text: "Pedidos"),
-            Tab(text: "P Pend"),
-            Tab(text: "Cobros"),
-            Tab(text: "C Pend"),
-          ],
-        ),
-      ),
+      appBar: OrdersAppBarWidget(
+          title: getTranslated('orders', context)!,
+          tabController: _tabController),
       body: TabBarView(
         controller: _tabController,
         children: [
@@ -269,8 +265,20 @@ class _OrdersPageState extends State<OrdersPage>
                 ? CircularProgressIndicator()
                 : _buildPendingOrdersList(context),
           ),
-          Center(child: Text('Cobros')),
-          Center(child: Text('C Pend')),
+          Center(
+              child: Text(
+            getTranslated('messageRecords', context)!,
+            style: robotoRegular.copyWith(
+              color: Colors.blue,
+            ),
+          )),
+          Center(
+              child: Text(
+            getTranslated('messageRecords', context)!,
+            style: robotoRegular.copyWith(
+              color: Colors.blue,
+            ),
+          )),
         ],
       ),
     );
@@ -290,6 +298,17 @@ class _OrdersPageState extends State<OrdersPage>
     // Filtrar los pedidos con estado "N" para mostrar solo los pendientes
     List<Map<String, dynamic>> pendingOrders =
         _orders.where((order) => order['estado'] == 'N').toList();
+
+    if (pendingOrders.isEmpty) {
+      return Center(
+        child: Text(
+          getTranslated('messageRecords', context)!,
+          style: robotoRegular.copyWith(
+            color: Colors.blue,
+          ),
+        ),
+      );
+    }
 
     return ListView.builder(
       itemCount: pendingOrders.length,

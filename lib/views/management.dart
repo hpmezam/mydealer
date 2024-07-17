@@ -1,7 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
+import 'package:mydealer/localization/language_constrants.dart';
+import 'package:mydealer/utils/dimensions.dart';
 import 'dart:convert';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:mydealer/utils/styles.dart';
+import 'package:mydealer/widgets/management/management_app_bar_widget.dart';
 
 class ManagementPage extends StatefulWidget {
   @override
@@ -133,9 +137,7 @@ class _ManagementPageState extends State<ManagementPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        title: Text('Consulta de Pedidos'),
-      ),
+      appBar: ManagementAppBarWidget(title: getTranslated('orderConsul', context)!),
       body: SingleChildScrollView(
         child: Column(
           children: [
@@ -204,16 +206,40 @@ class _ManagementPageState extends State<ManagementPage> {
     );
   }
 
+  // Widget _buildShowButton() {
+  //   return ElevatedButton(
+  //     onPressed: _fetchOrders,
+  //     child: Text('Mostrar'),
+  //   );
+  // }
+
   Widget _buildShowButton() {
     return ElevatedButton(
-      onPressed: _fetchOrders,
-      child: Text('Mostrar'),
-    );
+        onPressed: _fetchOrders,
+        style: ElevatedButton.styleFrom(
+          backgroundColor: Theme.of(context).primaryColor,
+          foregroundColor: Colors.white,
+          padding: EdgeInsets.symmetric(
+            horizontal: Dimensions.paddingSizeExtraLarge,
+            vertical: Dimensions.paddingSizeSmall,
+          ),
+          textStyle: TextStyle(
+            fontSize: Dimensions.fontSizeLarge,
+            fontWeight: FontWeight.bold,
+          ),
+        ),
+        child: Text(getTranslated('show', context)!));
   }
 
   Widget _buildOrderList() {
     if (_orders.isEmpty) {
-      return Center(child: Text('No se encontraron pedidos.'));
+      return Center(
+          child: Text(
+        getTranslated('messageOrders', context)!,
+        style: robotoRegular.copyWith(
+          color: Colors.blue,
+        ),
+      ));
     }
 
     return ListView.builder(
@@ -260,16 +286,14 @@ class _ManagementPageState extends State<ManagementPage> {
                 Text('Fecha: ${order.fecha}'),
                 Text('Estado: ${order.ordenEstado}'),
                 Text('Cliente: ${order.clienteNombre}'),
-                Divider(),
+                // Divider(),
+                Text("Detalles:"),
                 Table(
                   columnWidths: {
                     0: FlexColumnWidth(2),
                     1: FlexColumnWidth(2),
                     2: FlexColumnWidth(2),
                     3: FlexColumnWidth(2),
-                    4: FlexColumnWidth(2),
-                    5: FlexColumnWidth(2),
-                    6: FlexColumnWidth(2),
                   },
                   border: TableBorder.all(),
                   children: [
@@ -286,27 +310,12 @@ class _ManagementPageState extends State<ManagementPage> {
                       ),
                       Padding(
                         padding: const EdgeInsets.all(8.0),
-                        child: Text('Subtotal',
-                            style: TextStyle(fontWeight: FontWeight.bold)),
-                      ),
-                      Padding(
-                        padding: const EdgeInsets.all(8.0),
                         child: Text('Impto',
                             style: TextStyle(fontWeight: FontWeight.bold)),
                       ),
                       Padding(
                         padding: const EdgeInsets.all(8.0),
                         child: Text('Total',
-                            style: TextStyle(fontWeight: FontWeight.bold)),
-                      ),
-                      Padding(
-                        padding: const EdgeInsets.all(8.0),
-                        child: Text('Uni. Medida',
-                            style: TextStyle(fontWeight: FontWeight.bold)),
-                      ),
-                      Padding(
-                        padding: const EdgeInsets.all(8.0),
-                        child: Text('Catgría',
                             style: TextStyle(fontWeight: FontWeight.bold)),
                       ),
                     ]),
@@ -322,23 +331,11 @@ class _ManagementPageState extends State<ManagementPage> {
                         ),
                         Padding(
                           padding: const EdgeInsets.all(8.0),
-                          child: Text('\$${detail.subtotal ?? 0}'),
-                        ),
-                        Padding(
-                          padding: const EdgeInsets.all(8.0),
                           child: Text('\$${detail.impuesto ?? 0}'),
                         ),
                         Padding(
                           padding: const EdgeInsets.all(8.0),
                           child: Text('\$${detail.total ?? 0}'),
-                        ),
-                        Padding(
-                          padding: const EdgeInsets.all(8.0),
-                          child: Text('${detail.unidadmedida}'),
-                        ),
-                        Padding(
-                          padding: const EdgeInsets.all(8.0),
-                          child: Text('${detail.categoria}'),
                         ),
                       ]);
                     }).toList(),
