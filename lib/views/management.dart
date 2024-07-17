@@ -260,16 +260,14 @@ class _ManagementPageState extends State<ManagementPage> {
                 Text('Fecha: ${order.fecha}'),
                 Text('Estado: ${order.ordenEstado}'),
                 Text('Cliente: ${order.clienteNombre}'),
-                Divider(),
+                // Divider(),
+                Text("Detalles:"),
                 Table(
                   columnWidths: {
                     0: FlexColumnWidth(2),
                     1: FlexColumnWidth(2),
                     2: FlexColumnWidth(2),
                     3: FlexColumnWidth(2),
-                    4: FlexColumnWidth(2),
-                    5: FlexColumnWidth(2),
-                    6: FlexColumnWidth(2),
                   },
                   border: TableBorder.all(),
                   children: [
@@ -286,27 +284,12 @@ class _ManagementPageState extends State<ManagementPage> {
                       ),
                       Padding(
                         padding: const EdgeInsets.all(8.0),
-                        child: Text('Subtotal',
-                            style: TextStyle(fontWeight: FontWeight.bold)),
-                      ),
-                      Padding(
-                        padding: const EdgeInsets.all(8.0),
                         child: Text('Impto',
                             style: TextStyle(fontWeight: FontWeight.bold)),
                       ),
                       Padding(
                         padding: const EdgeInsets.all(8.0),
                         child: Text('Total',
-                            style: TextStyle(fontWeight: FontWeight.bold)),
-                      ),
-                      Padding(
-                        padding: const EdgeInsets.all(8.0),
-                        child: Text('Uni. Medida',
-                            style: TextStyle(fontWeight: FontWeight.bold)),
-                      ),
-                      Padding(
-                        padding: const EdgeInsets.all(8.0),
-                        child: Text('Catgría',
                             style: TextStyle(fontWeight: FontWeight.bold)),
                       ),
                     ]),
@@ -322,23 +305,11 @@ class _ManagementPageState extends State<ManagementPage> {
                         ),
                         Padding(
                           padding: const EdgeInsets.all(8.0),
-                          child: Text('\$${detail.subtotal ?? 0}'),
-                        ),
-                        Padding(
-                          padding: const EdgeInsets.all(8.0),
                           child: Text('\$${detail.impuesto ?? 0}'),
                         ),
                         Padding(
                           padding: const EdgeInsets.all(8.0),
                           child: Text('\$${detail.total ?? 0}'),
-                        ),
-                        Padding(
-                          padding: const EdgeInsets.all(8.0),
-                          child: Text('${detail.unidadmedida}'),
-                        ),
-                        Padding(
-                          padding: const EdgeInsets.all(8.0),
-                          child: Text('${detail.categoria}'),
                         ),
                       ]);
                     }).toList(),
