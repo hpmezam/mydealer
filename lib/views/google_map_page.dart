@@ -1,12 +1,12 @@
 import 'dart:async';
 import 'package:flutter/material.dart';
-import 'package:flutter_polyline_points/flutter_polyline_points.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:location/location.dart';
-import 'package:mydealer/utils/app_constants.dart';
+import 'package:mydealer/localization/language_constrants.dart';
 import 'package:mydealer/models/customers.dart';
 import 'package:mydealer/models/customersrutas.dart';
 import 'package:url_launcher/url_launcher.dart';
+import 'package:mydealer/controllers/custom_app_bar_widget.dart';
 
 class GoogleMapPage extends StatefulWidget {
   final LatLng destination;
@@ -55,9 +55,8 @@ class _GoogleMapPageState extends State<GoogleMapPage> {
     final customer = widget.customer;
 
     return Scaffold(
-      appBar: AppBar(
-        title: const Text("Ubicación"),
-      ),
+      appBar: CustomAppBarWidget(
+          isBackButtonExist: true, title: getTranslated('location', context)),
       body: Column(
         children: [
           Container(
@@ -122,7 +121,7 @@ class _GoogleMapPageState extends State<GoogleMapPage> {
                         Text(
                           isCustomerRutas
                               ? (customer as CustomerRutas).nombreCliente
-                              : (customer as Customer).nombreCliente,
+                              : (customer as Customer).nombre,
                           style: const TextStyle(
                               fontWeight: FontWeight.bold, fontSize: 16),
                         ),

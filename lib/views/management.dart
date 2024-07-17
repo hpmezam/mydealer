@@ -5,6 +5,7 @@ import 'package:mydealer/utils/dimensions.dart';
 import 'dart:convert';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:mydealer/utils/styles.dart';
+import 'package:mydealer/widgets/management/management_app_bar_widget.dart';
 
 class ManagementPage extends StatefulWidget {
   @override
@@ -136,9 +137,7 @@ class _ManagementPageState extends State<ManagementPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        title: Text('Consulta de Pedidos'),
-      ),
+      appBar: ManagementAppBarWidget(title: getTranslated('orderConsul', context)!),
       body: SingleChildScrollView(
         child: Column(
           children: [

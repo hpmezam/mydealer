@@ -4,7 +4,6 @@ import 'package:mydealer/models/customers.dart';
 import 'package:mydealer/views/google_map_page.dart';
 import 'package:mydealer/services/geocoding_service.dart';
 
-
 class CustomerWidget extends StatelessWidget {
   final Customer customer;
   final GeocodingService _geocodingService = GeocodingService();
@@ -18,7 +17,7 @@ class CustomerWidget extends StatelessWidget {
       elevation: 5,
       child: ListTile(
         title: Text(
-          '${customer.codCliente} - ${customer.nombreCliente}',
+          '${customer.codCliente} - ${customer.nombre}',
           style: const TextStyle(fontWeight: FontWeight.bold),
         ),
         subtitle: Padding(
@@ -27,7 +26,6 @@ class CustomerWidget extends StatelessWidget {
             crossAxisAlignment: CrossAxisAlignment.start,
             children: <Widget>[
               Text(customer.direccion),
-
               Text('Límite Crédito: ${customer.limiteCredito}'),
               Text('Saldo Disponible: ${customer.saldoPendiente}'),
             ],
@@ -46,9 +44,11 @@ class CustomerWidget extends StatelessWidget {
           if (customer.latitud != null && customer.longitud != null) {
             destination = LatLng(customer.latitud!, customer.longitud!);
           } else {
-            destination = await _geocodingService.getCoordinatesFromAddress(customer.direccion);
+            destination = await _geocodingService
+                .getCoordinatesFromAddress(customer.direccion);
             if (destination == null) {
-              destination = const LatLng(0.3235301158630212, -78.20971500086232);
+              destination =
+                  const LatLng(0.3235301158630212, -78.20971500086232);
             }
           }
 
@@ -56,13 +56,15 @@ class CustomerWidget extends StatelessWidget {
             Navigator.push(
               context,
               MaterialPageRoute(
-                builder: (context) => GoogleMapPage(destination: destination!, customer: customer),
+                builder: (context) => GoogleMapPage(
+                    destination: destination!, customer: customer),
               ),
             );
           } else {
             ScaffoldMessenger.of(context).showSnackBar(
               const SnackBar(
-                content: Text('No se pudieron obtener las coordenadas para la dirección proporcionada.'),
+                content: Text(
+                    'No se pudieron obtener las coordenadas para la dirección proporcionada.'),
                 backgroundColor: Colors.redAccent,
               ),
             );

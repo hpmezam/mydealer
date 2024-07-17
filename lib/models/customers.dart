@@ -3,7 +3,7 @@ class Customer {
   final String codCliente;
   final String codDireccionEnvio;
   final String cedulaRuc;
-  final String nombreCliente;
+  final String nombre;
   final String direccion;
   final double? latitud;
   final double? longitud;
@@ -15,7 +15,7 @@ class Customer {
     required this.codCliente,
     required this.codDireccionEnvio,
     required this.cedulaRuc,
-    required this.nombreCliente,
+    required this.nombre,
     required this.direccion,
     this.latitud,
     this.longitud,
@@ -29,7 +29,7 @@ class Customer {
       codCliente: json['codcliente']?.replaceAll("'", "") ?? '',
       codDireccionEnvio: json['coddireccionenvio']?.replaceAll("'", "") ?? '',
       cedulaRuc: json['cedularuc']?.replaceAll("'", "") ?? '',
-      nombreCliente: json['cliente_nombre']?.replaceAll("'", "") ?? '',
+      nombre: json['nombre']?.replaceAll("'", "") ?? '',
       direccion: json['direccion']?.replaceAll("'", "") ?? '',
       latitud: json['latitud'] != null
           ? double.tryParse(json['latitud'].toString())
@@ -48,7 +48,7 @@ class Customer {
       'codcliente': codCliente,
       'coddireccionenvio': codDireccionEnvio,
       'cedularuc': cedulaRuc,
-      'cliente_nombre': nombreCliente,
+      'nombre': nombre,
       'direccion': direccion,
       'latitud': latitud,
       'longitud': longitud,
@@ -63,7 +63,7 @@ class Customer {
       codCliente: map['codcliente'],
       codDireccionEnvio: map['coddireccionenvio'],
       cedulaRuc: map['cedularuc'],
-      nombreCliente: map['cliente_nombre'],
+      nombre: map['nombre'],
       direccion: map['direccion'],
       latitud: map['latitud'] != null ? map['latitud'] as double : null,
       longitud: map['longitud'] != null ? map['longitud'] as double : null,
@@ -77,7 +77,7 @@ class Customer {
     String? codCliente,
     String? codDireccionEnvio,
     String? cedulaRuc,
-    String? nombreCliente,
+    String? nombre,
     String? direccion,
     double? latitud,
     double? longitud,
@@ -89,7 +89,7 @@ class Customer {
       codCliente: codCliente ?? this.codCliente,
       codDireccionEnvio: codDireccionEnvio ?? this.codDireccionEnvio,
       cedulaRuc: cedulaRuc ?? this.cedulaRuc,
-      nombreCliente: nombreCliente ?? this.nombreCliente,
+      nombre: nombre ?? this.nombre,
       direccion: direccion ?? this.direccion,
       latitud: latitud ?? this.latitud,
       longitud: longitud ?? this.longitud,

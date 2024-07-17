@@ -202,9 +202,7 @@ class _CustomersPageState extends State<CustomersPage>
     } else {
       setState(() {
         filteredCustomers = customers.where((customer) {
-          return customer.nombreCliente
-                  .toLowerCase()
-                  .contains(query.toLowerCase()) ||
+          return customer.nombre.toLowerCase().contains(query.toLowerCase()) ||
               customer.codCliente.toLowerCase().contains(query.toLowerCase());
         }).toList();
 
