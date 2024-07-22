@@ -1,18 +1,12 @@
 import 'package:flutter/material.dart';
+import 'package:mydealer/services/auth_service.dart';
+import 'package:mydealer/views/auth_screen.dart';
 import 'package:mydealer/widgets/menu/custom_button_widget.dart';
-// import 'package:provider/provider.dart';
-// import 'package:mydealer/features/product/controllers/product_controller.dart';
 import 'package:mydealer/localization/language_constrants.dart';
-// import 'package:mydealer/features/auth/controllers/auth_controller.dart';
-// import 'package:mydealer/features/profile/controllers/profile_controller.dart';
 import 'package:mydealer/utils/color_resources.dart';
 import 'package:mydealer/utils/dimensions.dart';
 import 'package:mydealer/utils/images.dart';
 import 'package:mydealer/utils/styles.dart';
-// import 'package:mydealer/common/basewidgets/custom_button_widget.dart';
-// import 'package:mydealer/features/auth/screens/auth_screen.dart';
-
-// import 'delete_account_warning_dialog.dart';
 
 class SignOutConfirmationDialogWidget extends StatelessWidget {
   final bool isDelete;
@@ -90,44 +84,17 @@ class SignOutConfirmationDialogWidget extends StatelessWidget {
                                 Theme.of(context).colorScheme.error,
                             fontColor: Colors.white,
                             isColor: true,
-                            onTap: () {
-                              // if (isDelete) {
-                              //   Provider.of<ProfileController>(context,
-                              //           listen: false)
-                              //       .deleteCustomerAccount(context)
-                              //       .then((condition) {
-                              //     if (condition.response?.statusCode == null) {
-                              //       Navigator.of(context).pop();
-                              //       showDialog(
-                              //           context: context,
-                              //           builder: (_) =>
-                              //               const DeleteAccountWarningDialogWidget());
-                              //     } else if (condition.response!.statusCode ==
-                              //         200) {
-                              //       Navigator.pop(context);
-                              //       Provider.of<AuthController>(context,
-                              //               listen: false)
-                              //           .clearSharedData();
-                              //       Navigator.of(context).pushAndRemoveUntil(
-                              //           MaterialPageRoute(
-                              //               builder: (context) =>
-                              //                   const AuthScreen()),
-                              //           (route) => false);
-                              //     }
-                              //   });
-                              // } else {
-                              //   Provider.of<ProductController>(context,
-                              //           listen: false)
-                              //       .removeCookies();
-                              //   Provider.of<AuthController>(context,
-                              //           listen: false)
-                              //       .clearSharedData();
-                              //   Navigator.of(context).pushAndRemoveUntil(
-                              //       MaterialPageRoute(
-                              //           builder: (context) =>
-                              //               const AuthScreen()),
-                              //       (route) => false);
-                              // }
+                            onTap: () async {
+                              AuthService authService = AuthService();
+                              // Eliminar el token local
+                              await authService.clearToken();
+                              // Navegar al login y eliminar todas las rutas anteriores
+                              Navigator.pushAndRemoveUntil(
+                                context,
+                                MaterialPageRoute(
+                                    builder: (context) => AuthScreen()),
+                                (route) => false,
+                              );
                             },
                           ),
                         ),

@@ -120,7 +120,7 @@ class _GPSWidgetState extends State<GPSWidget> {
     if (orderedPoints.isNotEmpty) {
       LatLng lastPoint = orderedPoints.last;
       var lastRuta = widget.rutas.firstWhere(
-          (ruta) => ruta.latitud == lastPoint.latitude && ruta.longitud == lastPoint.longitude);
+              (ruta) => ruta.latitud == lastPoint.latitude && ruta.longitud == lastPoint.longitude);
 
       _markers.add(
         Marker(
@@ -212,9 +212,9 @@ class _GPSWidgetState extends State<GPSWidget> {
 
     while (remainingPoints.isNotEmpty) {
       remainingPoints.sort((a, b) => Geolocator.distanceBetween(
-              currentPoint.latitude, currentPoint.longitude, a.latitude, a.longitude)
+          currentPoint.latitude, currentPoint.longitude, a.latitude, a.longitude)
           .compareTo(Geolocator.distanceBetween(
-              currentPoint.latitude, currentPoint.longitude, b.latitude, b.longitude)));
+          currentPoint.latitude, currentPoint.longitude, b.latitude, b.longitude)));
       currentPoint = remainingPoints.removeAt(0);
       orderedPoints.add(currentPoint);
     }
@@ -252,73 +252,86 @@ class _GPSWidgetState extends State<GPSWidget> {
 
     final baseUrl = 'https://www.google.com/maps/dir/?api=1';
     final origin = 'origin=${_currentPosition!.latitude},${_currentPosition!.longitude}';
-    final destination = 'destination=${widget.rutas.last.latitud},${widget.rutas.last.longitud}';
     final waypoints = widget.rutas
+        .where((ruta) => ruta.latitud != null && ruta.longitud != null)
         .map((ruta) => '${ruta.latitud},${ruta.longitud}')
         .join('|');
-    final url = '$baseUrl&$origin&$destination&waypoints=$waypoints&travelmode=driving';
+    final destination = waypoints.split('|').last;
+    final url = '$baseUrl&$origin&destination=$destination&waypoints=$waypoints';
 
     if (await canLaunch(url)) {
       await launch(url);
     } else {
-      throw 'Could not launch $url';
+      throw 'Could not launch Google Maps';
     }
   }
 
   @override
   Widget build(BuildContext context) {
-    // Configurar la localización en español
-    Intl.defaultLocale = 'es';
-    // Formatea la fecha actual con el mes completo
-    String formattedDate = DateFormat('EEEE, d MMMM, yyyy', 'es').format(DateTime.now());
-
     return Scaffold(
-      appBar: AppBar(
-        actions: [
-          IconButton(
-            icon: Icon(Icons.navigation),
-            onPressed: _launchGoogleMaps,
-          ),
-        ],
-      ),
-      body: Column(
+      body: Stack(
         children: [
-          Padding(
-            padding: const EdgeInsets.all(8.0),
-            child: Text(
-              formattedDate,
-              style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
-            ),
-          ),
-          Center(
-            child: Container(
-              width: MediaQuery.of(context).size.width * 0.8, // Ajustar el tamaño
-              height: MediaQuery.of(context).size.height * 0.6, // Ajustar el tamaño
-              child: _currentPosition == null
-                  ? Center(child: CircularProgressIndicator())
-                  : GoogleMap(
+          if (_currentPosition != null)
+            Center(
+              child: Container(
+                height: MediaQuery.of(context).size.height * 0.72, // 10% smaller in height
+                width: MediaQuery.of(context).size.width * 0.85,  // 5% wider
+                child: ClipRRect(
+                  borderRadius: BorderRadius.circular(16), // Ajusta el radio de los bordes
+                  child: GestureDetector(
+                    onPanUpdate: (details) {
+                      // Consume el gesto para que el PageView no lo maneje
+                    },
+                    child: GoogleMap(
                       initialCameraPosition: CameraPosition(
                         target: _currentPosition!,
-                        zoom: 15,
+                        zoom: 14.0,
                       ),
                       markers: _markers,
                       polylines: _polylines,
                       onMapCreated: (GoogleMapController controller) {
                         _mapController = controller;
-                        if (_polylines.isNotEmpty) {
-                          _fitMapToPolylines(_polylines.first.points);
-                        }
+                        _fitMapToPolylines(_markers.map((m) => m.position).toList());
                       },
-                      zoomGesturesEnabled: true, // Habilitar zoom
-                      scrollGesturesEnabled: true, // Habilitar desplazamiento
-                      tiltGesturesEnabled: true, // Habilitar inclinación
-                      rotateGesturesEnabled: true, // Habilitar rotación
-                      myLocationEnabled: true, // Mostrar mi ubicación actual en el mapa
-                      myLocationButtonEnabled: true, // Mostrar botón para centrar la ubicación
                       gestureRecognizers: Set()
-                        ..add(Factory<OneSequenceGestureRecognizer>(
-                            () => EagerGestureRecognizer())),
+                        ..add(Factory<PanGestureRecognizer>(() => PanGestureRecognizer()))
+                        ..add(Factory<ScaleGestureRecognizer>(() => ScaleGestureRecognizer()))
+                        ..add(Factory<TapGestureRecognizer>(() => TapGestureRecognizer()))
+                        ..add(Factory<VerticalDragGestureRecognizer>(() => VerticalDragGestureRecognizer())),
                     ),
+                  ),
+                ),
+              ),
+            ),
+          Positioned(
+            top: 36, // Align with the top of the map
+            left: 0,
+            right: 0,
+            child: Center(
+              child: Container(
+                padding: EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+                decoration: BoxDecoration(
+                  color: Colors.indigo.withOpacity(0.7),
+                  borderRadius: BorderRadius.circular(8),
+                ),
+                child: Text(
+                  DateFormat('EEEE, dd-MM-yyyy', 'es_ES').format(DateTime.now()),
+                  style: TextStyle(color: Colors.white, fontSize: 18), // Increased font size
+                ),
+              ),
+            ),
+          ),
+          Positioned(
+            bottom: 36,
+            left: 36,
+            child: FloatingActionButton.extended(
+              onPressed: _launchGoogleMaps,
+              label: Text(
+                'Navegar',
+                style: TextStyle(color: Colors.white),
+              ),
+              icon: Icon(Icons.navigation, color: Colors.white),
+              backgroundColor: Colors.blue[900],
             ),
           ),
         ],
@@ -326,3 +339,5 @@ class _GPSWidgetState extends State<GPSWidget> {
     );
   }
 }
+
+

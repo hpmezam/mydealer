@@ -11,6 +11,8 @@ class AuthController extends ChangeNotifier {
   TextEditingController get emailController => _emailController;
   TextEditingController get passwordController => _passwordController;
   bool get isLoading => _isLoading;
+  bool _isActiveRememberMe = false;
+  bool get isActiveRememberMe => _isActiveRememberMe;
 
   Future<void> login(BuildContext context) async {
     if (_emailController.text.isEmpty || _passwordController.text.isEmpty) {
