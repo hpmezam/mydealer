@@ -79,6 +79,7 @@ class AuthService {
       await prefs.setString('codruta', codruta);
       String codvendedor = dataUsuario['codvendedor'];
       await prefs.setString('codvendedor', codvendedor);
+      print(codvendedor);
       return true;
     } catch (e) {
       print('Failed to save user data: $e');
@@ -86,8 +87,29 @@ class AuthService {
     }
   }
 
+  Future<Map<String, dynamic>?> getUserData() async {
+    final SharedPreferences prefs = await SharedPreferences.getInstance();
+    final String? userDataString = prefs.getString('data_usuario');
+    if (userDataString != null) {
+      return jsonDecode(userDataString) as Map<String, dynamic>;
+    }
+    return null;
+  }
+
   Future<void> _storeToken(String token) async {
     final SharedPreferences prefs = await SharedPreferences.getInstance();
     await prefs.setString('jwt_token', token);
+  }
+
+  Future<void> clearToken() async {
+    final SharedPreferences prefs = await SharedPreferences.getInstance();
+    await prefs.remove('username');
+    await prefs.remove('password');
+    await prefs.remove('apiResponse');
+    await prefs.remove('nombre');
+    await prefs.remove('login');
+    await prefs.remove('codruta');
+    await prefs.remove('codvendedor');
+    await prefs.remove('jwt_token');
   }
 }
